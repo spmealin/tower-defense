@@ -4,7 +4,8 @@ import type { Position } from "./Position";
  * The possible terrains in a position.
  */
 export const enum Terrain {
-    normal
+    normal,
+    blocked
 }
 
 /** The width of the board. */
@@ -38,7 +39,11 @@ export class GameBoard {
             const col: Terrain[] = [];
             terrainMap.push(col);
             for (let j = 0; j < 50; j++) {
-                col.push(Terrain.normal);
+                if (j !== 0 && Math.random() <= 0.2) {
+                    col.push(Terrain.blocked);
+                } else {
+                    col.push(Terrain.normal);
+                }
             }
         }
     }
@@ -50,7 +55,12 @@ export class GameBoard {
      * @param p - the position to check
      */
     isValidPosition(p: Position) {
-        // TODO: factor in terrain before we just say yes.
-        return p.x >= 0 && p.x < X_MAX && p.y >= 0 && p.y < Y_MAX;
+        return (
+            p.x >= 0 &&
+            p.x < X_MAX &&
+            p.y >= 0 &&
+            p.y < Y_MAX &&
+            this._terrainMap[p.x][p.y] === Terrain.normal
+        );
     }
 }
