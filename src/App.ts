@@ -33,6 +33,22 @@ export function main(root: HTMLElement): void {
 }
 
 /**
+ * AudioContext can't initialize until a user has done something.
+ * So, wait for the user to do something, initialize the audio,
+ * and then remove the initializations
+ *
+ * @param player - the audio player
+ */
+function waitToInitializeAudio(player: AudioPlayer) {
+    const userInitCheck = () => {
+        player.init();
+        removeEventListener("keydown", userInitCheck);
+    };
+    window.addEventListener("keydown", userInitCheck);
+    window.addEventListener("click", userInitCheck);
+}
+
+/**
  * Set up the elements of the page and the global objects that we need.
  *
  * @param root - the root element that we should be adding elements to on the page
@@ -52,13 +68,7 @@ function pageInit(root: HTMLElement): void {
 
     // Audio player setup
     player = new AudioPlayer();
-
-    const userInitCheck = () => {
-        player.init();
-        removeEventListener("keydown", userInitCheck);
-    };
-    window.addEventListener("keydown", userInitCheck);
-    window.addEventListener("click", userInitCheck);
+    waitToInitializeAudio(player);
 
     // Game setup
     game = new Game();
