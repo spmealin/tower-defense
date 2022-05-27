@@ -71,4 +71,11 @@ export class Observer {
             );
         }
     }
+
+    /**
+     * Player character's position
+     */
+    get position(): Position {
+        return this._position;
+    }
 }

@@ -11,6 +11,8 @@ import { AudioPlayer } from "./ui/AudioPlayer";
 import { AudioRenderer } from "./ui/renderers/AudioRenderer";
 import { SpeechRenderer } from "./ui/renderers/SpeechRenderer";
 import { ScreenReaderBridge } from "./ui/ScreenReaderBridge";
+import { Artist } from "./ui/visuals/Artist";
+import { VisualManager } from "./ui/visuals/VisualManager";
 
 let sr: ScreenReaderBridge;
 let game: Game;
@@ -18,8 +20,10 @@ let keyboardManager: KeyboardManager;
 let observer: Observer;
 let speechRenderer: SpeechRenderer;
 let audioRenderer: AudioRenderer;
+let visualManager: VisualManager;
 let animationClock: AnimationClock;
 let player: AudioPlayer;
+let artist: Artist;
 
 /**
  * The main entry point of the application.
@@ -88,6 +92,12 @@ function pageInit(root: HTMLElement): void {
 
     // more game setup
     animationClock = new AnimationClock((delta) => handleNewFrame(delta));
+
+    // visual setup
+    const drawingContainer = document.createElement("div");
+    root.appendChild(drawingContainer);
+    artist = new Artist(drawingContainer, game);
+    visualManager = new VisualManager(game, observer, artist);
 }
 
 /**
@@ -144,4 +154,5 @@ function startGame() {
 function handleNewFrame(delta: number): void {
     game.update(delta);
     keyboardManager.update();
+    visualManager.update();
 }

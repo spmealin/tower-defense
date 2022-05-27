@@ -1,0 +1,9 @@
+canvas {
+    border: 1px solid black;
+}
+
+div[aria-live]{
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+}

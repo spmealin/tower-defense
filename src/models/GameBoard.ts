@@ -18,6 +18,8 @@ const Y_MAX = 51;
  */
 export class GameBoard {
     private readonly _terrainMap: Terrain[][];
+    private readonly _boardWidth = X_MAX;
+    private readonly _boardHeight = Y_MAX;
 
     /**
      * Create a GameBoard.
@@ -35,10 +37,10 @@ export class GameBoard {
      */
     _createTerrainMap(terrainMap: Terrain[][]) {
         // TODO: rewrite this not to be hardcoded.
-        for (let i = 0; i < X_MAX; i++) {
+        for (let i = 0; i < this._boardWidth; i++) {
             const col: Terrain[] = [];
             terrainMap.push(col);
-            for (let j = 0; j < Y_MAX; j++) {
+            for (let j = 0; j < this._boardHeight; j++) {
                 if (j !== 0 && Math.random() <= 0.2) {
                     col.push(Terrain.blocked);
                 } else {
@@ -58,11 +60,29 @@ export class GameBoard {
         let valid = false;
         const x = p.x;
         const y = p.y;
-        if (x >= 0 && x < X_MAX && y >= 0 && y < Y_MAX) {
+        if (x >= 0 && x < this._boardWidth && y >= 0 && y < this._boardHeight) {
             if (this._terrainMap[x][y] === Terrain.normal) {
                 valid = true;
             }
         }
         return valid;
+    }
+
+    /**
+     * Get the boardWidth
+     *
+     * @readonly
+     */
+    get boardWidth(): number {
+        return this._boardWidth;
+    }
+
+    /**
+     * Get the boardWidth
+     *
+     * @readonly
+     */
+    get boardHeight(): number {
+        return this._boardHeight;
     }
 }
