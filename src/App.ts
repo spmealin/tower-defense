@@ -1,9 +1,14 @@
 import { AnimationClock } from "./AnimationClock";
-import { UIStatusMessageEvent } from "./events/StatusEvents";
+import {
+    UIStatusMessageEvent,
+    UIStatusSoundEvent
+} from "./events/StatusEvents";
 import { Game } from "./Game";
 import { KeyboardManager, KeyTransition } from "./input/KeyboardManager";
 import * as keys from "./input/KeyConstants";
 import { Observer } from "./models/Observer";
+import { AudioPlayer } from "./ui/AudioPlayer";
+import { AudioRenderer } from "./ui/renderers/AudioRenderer";
 import { SpeechRenderer } from "./ui/renderers/SpeechRenderer";
 import { ScreenReaderBridge } from "./ui/ScreenReaderBridge";
 
@@ -12,7 +17,9 @@ let game: Game;
 let keyboardManager: KeyboardManager;
 let observer: Observer;
 let speechRenderer: SpeechRenderer;
+let audioRenderer: AudioRenderer;
 let animationClock: AnimationClock;
+let player: AudioPlayer;
 
 /**
  * The main entry point of the application.
@@ -31,20 +38,45 @@ export function main(root: HTMLElement): void {
  * @param root - the root element that we should be adding elements to on the page
  */
 function pageInit(root: HTMLElement): void {
+    // Page setup - interactive focus eleemnt
     const focusDiv = document.createElement("div");
     focusDiv.setAttribute("tabIndex", "0");
     root.appendChild(focusDiv);
     focusDiv.focus();
+
+    // ScreenReaderBridge setup
     const speechDiv = document.createElement("div");
     ScreenReaderBridge.addAriaAttributes(speechDiv);
     root.appendChild(speechDiv);
     sr = new ScreenReaderBridge(speechDiv);
+
+    // Audio player setup
+    player = new AudioPlayer();
+
+    const userInitCheck = () => {
+        player.init();
+        removeEventListener("keydown", userInitCheck);
+    };
+    window.addEventListener("keydown", userInitCheck);
+    window.addEventListener("click", userInitCheck);
+
+    // Game setup
     game = new Game();
     game.initialize();
+
+    // Input setup
     keyboardManager = new KeyboardManager(focusDiv);
     observer = new Observer(game);
+
+    // SpeechRenderer setup
     speechRenderer = new SpeechRenderer(game);
     speechRenderer.startListening();
+
+    // AudioRenderer setup
+    audioRenderer = new AudioRenderer(game);
+    audioRenderer.startListening();
+
+    // more game setup
     animationClock = new AnimationClock((delta) => handleNewFrame(delta));
 }
 
@@ -56,6 +88,11 @@ function handlerInit(): void {
     game.eventBus.addEventHandler(UIStatusMessageEvent, (event) => {
         if (event instanceof UIStatusMessageEvent) {
             sr.render(event.message);
+        }
+    });
+    game.eventBus.addEventHandler(UIStatusSoundEvent, (event) => {
+        if (event instanceof UIStatusSoundEvent) {
+            void player.render(event.audioCode, event.pan, event.adjustment);
         }
     });
     // Set up the arrow keys.
