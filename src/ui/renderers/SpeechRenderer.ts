@@ -34,10 +34,8 @@ export class SpeechRenderer {
      * @param event - the ObserverMovedEvent
      */
     private _handleObserverMovedEvents(event: ObserverMovedEvent): void {
-        // We add one to each coordinate since we want the board to look like it runs from 1..max rather than 0..max-1.
-        const x = event.newPosition.x + 1;
-        const y = event.newPosition.y + 1;
-        const message = `${x}, ${y}.`;
+        const p = event.newPosition;
+        const message = `${p.x}, ${p.y}.`;
         this._game.eventBus.raiseEvent(new UIStatusMessageEvent(message));
     }
 }

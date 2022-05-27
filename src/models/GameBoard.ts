@@ -9,9 +9,9 @@ export const enum Terrain {
 }
 
 /** The width of the board. */
-const X_MAX = 50;
+const X_MAX = 51;
 /** The height of the board. */
-const Y_MAX = 50;
+const Y_MAX = 51;
 
 /**
  * The game board where everything happens.
@@ -35,10 +35,10 @@ export class GameBoard {
      */
     _createTerrainMap(terrainMap: Terrain[][]) {
         // TODO: rewrite this not to be hardcoded.
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < X_MAX; i++) {
             const col: Terrain[] = [];
             terrainMap.push(col);
-            for (let j = 0; j < 50; j++) {
+            for (let j = 0; j < Y_MAX; j++) {
                 if (j !== 0 && Math.random() <= 0.2) {
                     col.push(Terrain.blocked);
                 } else {
@@ -55,12 +55,14 @@ export class GameBoard {
      * @param p - the position to check
      */
     isValidPosition(p: Position) {
-        return (
-            p.x >= 0 &&
-            p.x < X_MAX &&
-            p.y >= 0 &&
-            p.y < Y_MAX &&
-            this._terrainMap[p.x][p.y] === Terrain.normal
-        );
+        let valid = false;
+        const x = p.x;
+        const y = p.y;
+        if (x >= 0 && x < X_MAX && y >= 0 && y < Y_MAX) {
+            if (this._terrainMap[x][y] === Terrain.normal) {
+                valid = true;
+            }
+        }
+        return valid;
     }
 }
