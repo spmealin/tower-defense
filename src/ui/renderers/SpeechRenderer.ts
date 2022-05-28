@@ -35,7 +35,9 @@ export class SpeechRenderer {
      */
     private _handleObserverMovedEvents(event: ObserverMovedEvent): void {
         const p = event.newPosition;
-        const message = `${p.x}, ${p.y}.`;
+        const contents = this._game.gameBoard.getContents(p);
+        const spokenContents = contents === null ? "" : "Tower";
+        const message = `${p.x}, ${p.y}. ${spokenContents}`;
         this._game.eventBus.raiseEvent(new UIStatusMessageEvent(message));
     }
 }
