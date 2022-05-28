@@ -25,7 +25,7 @@ const audioCodeToFileMap: audioCodeToFileMapType = {
 };
 
 /**
- * lorem ipsum
+ * Uses the WebAudio API to play audio files
  */
 export class AudioPlayer {
     private static audioContext: AudioContext;
