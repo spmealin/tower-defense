@@ -79,7 +79,14 @@ export class Artist {
             this._cellHeight
         );
 
-        if (!this._game.gameBoard.isValidPosition(pos)) {
+        const contentsOfTile = this._game.gameBoard.getContents(pos);
+        if (contentsOfTile !== null) {
+            ctx.strokeText(
+                "T",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        } else if (!this._game.gameBoard.isValidPosition(pos)) {
             ctx.strokeText(
                 "X",
                 (pos.x + 0.3) * this._cellWidth,

@@ -163,6 +163,13 @@ function handlerInit(): void {
         () => observer.moveDown(),
         KeyTransition.KeyPressed
     );
+    keyboardManager.addHandler(
+        keys.KEY_T,
+        () => {
+            observer.buildTower();
+        },
+        KeyTransition.KeyPressed
+    );
 }
 
 /**
