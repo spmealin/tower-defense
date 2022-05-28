@@ -14,10 +14,12 @@ export class Observer {
      * Create an observer object.
      *
      * @param game - the game that this observer is watching
+     * @param startingX - the starting X position of the observer
+     * @param startingY - the starting Y position of the observer
      */
-    constructor(game: Game) {
+    constructor(game: Game, startingX = 0, startingY = 0) {
         this._game = game;
-        this._position = new Position();
+        this._position = new Position(startingX, startingY);
     }
 
     /**

@@ -14,6 +14,18 @@ import { ScreenReaderBridge } from "./ui/ScreenReaderBridge";
 import { Artist } from "./ui/visuals/Artist";
 import { VisualManager } from "./ui/visuals/VisualManager";
 
+const levelMapFiles = ["./maps/loop.txt", "./maps/zigzag.txt"];
+
+/**
+ * Return a random item from an array
+ *
+ * @param arr An array of anything
+ * @returns a random item
+ */
+function randomArrayItem<T>(arr: T[]): T {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
 let sr: ScreenReaderBridge;
 let game: Game;
 let keyboardManager: KeyboardManager;
@@ -31,9 +43,11 @@ let artist: Artist;
  * @param root - the root element of the application
  */
 export function main(root: HTMLElement): void {
-    pageInit(root);
-    handlerInit();
-    startGame();
+    void initializeGameBoard((board) => {
+        pageInit(root, board);
+        handlerInit();
+        startGame();
+    });
 }
 
 /**
@@ -53,11 +67,24 @@ function waitToInitializeAudio(player: AudioPlayer) {
 }
 
 /**
+ * Fetch level plan from a text file, and then initialize the board
+ *
+ * @param cb Gameboard initialization callback
+ */
+async function initializeGameBoard(cb: (board: string[][]) => void) {
+    const filename = randomArrayItem<string>(levelMapFiles);
+    const textFile = await (await fetch(filename)).text();
+    const board = textFile.split("\n").map((row) => row.trim().split(""));
+    cb(board);
+}
+
+/**
  * Set up the elements of the page and the global objects that we need.
  *
  * @param root - the root element that we should be adding elements to on the page
+ * @param board - the board of the game
  */
-function pageInit(root: HTMLElement): void {
+function pageInit(root: HTMLElement, board: string[][]): void {
     // Page setup - interactive focus eleemnt
     const focusDiv = document.createElement("div");
     focusDiv.setAttribute("tabIndex", "0");
@@ -76,11 +103,11 @@ function pageInit(root: HTMLElement): void {
 
     // Game setup
     game = new Game();
-    game.initialize();
+    game.initialize(board);
 
     // Input setup
     keyboardManager = new KeyboardManager(focusDiv);
-    observer = new Observer(game);
+    observer = new Observer(game, 25, 25);
 
     // SpeechRenderer setup
     speechRenderer = new SpeechRenderer(game);

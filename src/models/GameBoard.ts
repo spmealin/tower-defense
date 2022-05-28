@@ -4,9 +4,16 @@ import type { Position } from "./Position";
  * The possible terrains in a position.
  */
 export const enum Terrain {
-    normal,
-    blocked
+    road,
+    blocked,
+    home
 }
+
+const tileCodeMap = {
+    "0": Terrain.blocked,
+    "1": Terrain.road,
+    X: Terrain.home
+};
 
 /** The width of the board. */
 const X_MAX = 51;
@@ -26,27 +33,21 @@ export class GameBoard {
      */
     constructor() {
         this._terrainMap = [];
-        this._createTerrainMap(this._terrainMap);
     }
 
     /**
-     * Set up the terrain.
+     * Load board based on a file's level design
      *
-     * @param terrainMap - the root of the terrain map
-     * @private
+     * @param board Array from file of level design
      */
-    _createTerrainMap(terrainMap: Terrain[][]) {
-        // TODO: rewrite this not to be hardcoded.
-        for (let i = 0; i < this._boardWidth; i++) {
+    public loadTerrainMap(board: string[][]) {
+        for (let i = 0; i < board.length; i++) {
             const col: Terrain[] = [];
-            terrainMap.push(col);
-            for (let j = 0; j < this._boardHeight; j++) {
-                if (j !== 0 && Math.random() <= 0.2) {
-                    col.push(Terrain.blocked);
-                } else {
-                    col.push(Terrain.normal);
-                }
+            for (let j = 0; j < board[i].length; j++) {
+                const tile = board[i][j] as keyof typeof tileCodeMap;
+                col.push(tileCodeMap[tile]);
             }
+            this._terrainMap.push(col);
         }
     }
 
@@ -61,7 +62,7 @@ export class GameBoard {
         const x = p.x;
         const y = p.y;
         if (x >= 0 && x < this._boardWidth && y >= 0 && y < this._boardHeight) {
-            if (this._terrainMap[x][y] === Terrain.normal) {
+            if (this._terrainMap[x][y] !== Terrain.blocked) {
                 valid = true;
             }
         }
