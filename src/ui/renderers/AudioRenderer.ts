@@ -11,7 +11,7 @@ import { audioCodeOptions } from "../../types";
  */
 export class AudioRenderer {
     private _game: Game;
-    private static speed = 200;
+    private static speed = 25;
 
     /**
      * Construct a AudioRenderer object.
