@@ -14,6 +14,9 @@ export class Tower extends GameObject {
     private _towerStatus = TowerStatus.building;
     private _elapsedTime = 0;
     private _builtTime = -10 * 1000;
+    private readonly _startingHealth = 100;
+    private _health = this._startingHealth;
+    private _attack = 10;
 
     /**
      * Initialize a tower
@@ -57,6 +60,20 @@ export class Tower extends GameObject {
      */
     get towerStatus(): TowerStatus {
         return this._towerStatus;
+    }
+
+    /**
+     * Get health of tower
+     */
+    get health(): number {
+        return this._health;
+    }
+
+    /**
+     * Get health of tower, represented as percent of starting health
+     */
+    get healthAsPercent(): number {
+        return this._health / this._startingHealth;
     }
 
     /**

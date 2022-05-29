@@ -22,7 +22,7 @@ function describeContents(contents: Tower | null): string {
     }
 
     if (contents.towerStatus === TowerStatus.active) {
-        return "Tower";
+        return `Tower, ${Math.floor(contents.healthAsPercent * 100)}%`;
     }
 
     return "unknown";
