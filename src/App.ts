@@ -1,5 +1,6 @@
 import { AnimationClock } from "./AnimationClock";
 import {
+    UIStatusErrorMessage,
     UIStatusMessageEvent,
     UIStatusSoundEvent
 } from "./events/StatusEvents";
@@ -137,6 +138,11 @@ function handlerInit(): void {
             sr.render(event.message);
         }
     });
+    game.eventBus.addEventHandler(UIStatusErrorMessage, (event) => {
+        if (event instanceof UIStatusErrorMessage) {
+            sr.render(event.message);
+        }
+    });
     game.eventBus.addEventHandler(UIStatusSoundEvent, (event) => {
         if (event instanceof UIStatusSoundEvent) {
             void player.render(event.audioCode, event.pan, event.adjustment);
@@ -167,6 +173,13 @@ function handlerInit(): void {
         keys.KEY_T,
         () => {
             observer.buildTower();
+        },
+        KeyTransition.KeyPressed
+    );
+    keyboardManager.addHandler(
+        keys.KEY_J,
+        () => {
+            observer.jumpToTower();
         },
         KeyTransition.KeyPressed
     );

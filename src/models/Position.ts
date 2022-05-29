@@ -34,4 +34,14 @@ export class Position {
     get y(): number {
         return this._y;
     }
+
+    /**
+     * Check if another position is the same as this one
+     *
+     * @param newPosition another position being checked against
+     * @returns if they're equal
+     */
+    equals(newPosition: Position): boolean {
+        return this._x === newPosition.x && this._y === newPosition.y;
+    }
 }

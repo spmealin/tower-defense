@@ -145,4 +145,11 @@ export class GameBoard extends GameObject {
     get boardHeight(): number {
         return this._boardHeight;
     }
+
+    /**
+     * Get the children
+     */
+    get children(): GameObject[] {
+        return this._children;
+    }
 }

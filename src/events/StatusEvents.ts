@@ -2,6 +2,7 @@ import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
 import type { Tower } from "../models/Tower";
 import type { audioCodeOptions, TowerEventType } from "../types";
+import type { ErrorMessage } from "./ErrorMessages";
 
 /**
  * An event for when an Observer moves.
@@ -71,6 +72,31 @@ export class UIStatusMessageEvent {
      */
     get message(): string {
         return this._message;
+    }
+}
+
+/**
+ * Status message for errros
+ */
+export class UIStatusErrorMessage {
+    private readonly _type: ErrorMessage;
+
+    /**
+     * Generate the error type
+     *
+     * @param type - the type of error
+     */
+    constructor(type: ErrorMessage) {
+        this._type = type;
+    }
+
+    /**
+     * A message for this error
+     *
+     * @readonly
+     */
+    get message(): string {
+        return "No towers to jump to";
     }
 }
 
