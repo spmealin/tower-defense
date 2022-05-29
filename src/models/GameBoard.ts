@@ -35,6 +35,7 @@ export class GameBoard {
      */
     constructor() {
         this._terrainMap = [];
+        this._createEmptyContentsMap();
     }
 
     /**
@@ -50,19 +51,6 @@ export class GameBoard {
                 col.push(tileCodeMap[tile]);
             }
             this._terrainMap.push(col);
-        }
-    }
-
-    /**
-     * Create an empty contents map that's scaled to the size of the board
-     */
-    _createEmptyContentsMap() {
-        for (let i = 0; i < this._boardWidth; i++) {
-            const temp: (Tower | null)[] = [];
-            for (let j = 0; j < this._boardHeight; j++) {
-                temp.push(null);
-            }
-            this._contentsMap.push(temp);
         }
     }
 

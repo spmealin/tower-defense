@@ -34,17 +34,6 @@ export class Observer {
     }
 
     /**
-     * Build a tower at the current location
-     */
-    buildTower(): void {
-        this._game.buildTower?.(this._position);
-        // Raise event.
-        this._game.eventBus.raiseEvent(
-            new ObserverMovedEvent(this, this._position, this._position)
-        );
-    }
-
-    /**
      * Move right one position if possible.
      */
     moveRight(): void {
