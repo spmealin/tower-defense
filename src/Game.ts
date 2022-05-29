@@ -1,12 +1,13 @@
 import { EventBus } from "./events/EventBus";
 import { GameBoard } from "./models/GameBoard";
+import { GameObject } from "./models/GameObject";
 import type { Position } from "./models/Position";
 import { Tower } from "./models/Tower";
 
 /**
  * The main game.
  */
-export class Game {
+export class Game extends GameObject {
     private readonly _gameBoard;
     private readonly _eventBus;
     private _elapsedGameTime = 0;
@@ -15,8 +16,10 @@ export class Game {
      * Create a game object.
      */
     constructor() {
+        super();
         this._gameBoard = new GameBoard();
         this._eventBus = new EventBus();
+        this._children.push(this._gameBoard);
     }
 
     /**
@@ -53,10 +56,11 @@ export class Game {
      *
      * @param delta - the time in milliseconds since the last frame
      */
-    update(delta: number): void {
+    update = (delta: number) => {
         this._elapsedGameTime += delta;
         this._eventBus.dispatchEvents();
-    }
+        super.update(delta);
+    };
 
     /**
      * Build a tower

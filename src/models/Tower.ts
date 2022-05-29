@@ -1,10 +1,11 @@
 import { Position } from "./Position";
 import type { Game } from "../Game";
+import { GameObject } from "./GameObject";
 
 /**
  * An individual tower
  */
-export class Tower {
+export class Tower extends GameObject {
     private _game: Game;
     private _position: Position;
     private _range = 2;
@@ -17,6 +18,7 @@ export class Tower {
      * @param position - where the tower is
      */
     constructor(game: Game, position: Position) {
+        super();
         this._game = game;
         this._position = position;
 

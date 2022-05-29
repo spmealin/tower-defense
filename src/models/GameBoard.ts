@@ -1,3 +1,4 @@
+import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
 import type { Tower } from "./Tower";
 
@@ -24,7 +25,7 @@ const Y_MAX = 51;
 /**
  * The game board where everything happens.
  */
-export class GameBoard {
+export class GameBoard extends GameObject {
     private readonly _terrainMap: Terrain[][];
     private readonly _boardWidth = X_MAX;
     private readonly _boardHeight = Y_MAX;
@@ -34,6 +35,7 @@ export class GameBoard {
      * Create a GameBoard.
      */
     constructor() {
+        super();
         this._terrainMap = [];
         this._createEmptyContentsMap();
     }
@@ -111,6 +113,7 @@ export class GameBoard {
     addTowerToMap(tower: Tower) {
         const { x, y } = tower.position;
         this._contentsMap[x][y] = tower;
+        this._children.push(tower);
     }
 
     /**
