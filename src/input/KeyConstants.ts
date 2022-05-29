@@ -11,3 +11,4 @@ export const CONTROL_LEFT = "ControlLeft";
 export const CONTROL_RIGHT = "ControlRight";
 export const SHIFT_LEFT = "ShiftLeft";
 export const SHIFT_RIGHT = "ShiftRight";
+export const KEY_T = "KeyT";
