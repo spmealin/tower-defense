@@ -37,9 +37,11 @@ export class Game {
 
     /**
      * Do any necessary loading.
+     *
+     * @param board - 2D array of codes, representing aspects of the board
      */
-    initialize(): void {
-        // Do something at some point.
+    initialize(board: string[][]): void {
+        this._gameBoard.loadTerrainMap(board);
     }
 
     /**
