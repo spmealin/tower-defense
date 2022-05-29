@@ -3,6 +3,30 @@ import {
     UIStatusMessageEvent
 } from "../../events/StatusEvents";
 import type { Game } from "../../Game";
+import type { Tower } from "../../models/Tower";
+import { TowerStatus } from "../../types";
+
+/**
+ * Generate a description of the contents of a tile
+ *
+ * @param contents contents of a tile
+ * @returns description
+ */
+function describeContents(contents: Tower | null): string {
+    if (contents === null) {
+        return "";
+    }
+
+    if (contents.towerStatus === TowerStatus.building) {
+        return "building tower";
+    }
+
+    if (contents.towerStatus === TowerStatus.active) {
+        return "Tower";
+    }
+
+    return "unknown";
+}
 
 /**
  * Converts game events to user friendly UIStringMessageEvents.
@@ -36,7 +60,7 @@ export class SpeechRenderer {
     private _handleObserverMovedEvents(event: ObserverMovedEvent): void {
         const p = event.newPosition;
         const contents = this._game.gameBoard.getContents(p);
-        const spokenContents = contents === null ? "" : "Tower";
+        const spokenContents = describeContents(contents);
         const message = `${p.x}, ${p.y}. ${spokenContents}`;
         this._game.eventBus.raiseEvent(new UIStatusMessageEvent(message));
     }

@@ -1,8 +1,6 @@
 import { EventBus } from "./events/EventBus";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
-import type { Position } from "./models/Position";
-import { Tower } from "./models/Tower";
 
 /**
  * The main game.
@@ -61,14 +59,4 @@ export class Game extends GameObject {
         this._eventBus.dispatchEvents();
         super.update(delta);
     };
-
-    /**
-     * Build a tower
-     *
-     * @param position location of tower
-     */
-    buildTower(position: Position): void {
-        const tower = new Tower(this, position);
-        this._gameBoard.addTowerToMap(tower);
-    }
 }

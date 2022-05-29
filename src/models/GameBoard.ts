@@ -1,6 +1,6 @@
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
-import type { Tower } from "./Tower";
+import { Tower } from "./Tower";
 
 /**
  * The possible terrains in a position.
@@ -106,11 +106,21 @@ export class GameBoard extends GameObject {
     }
 
     /**
+     * Build a tower
+     *
+     * @param position location of tower
+     */
+    buildTower(position: Position): void {
+        const tower = new Tower(this, position);
+        this._addTowerToMap(tower);
+    }
+
+    /**
      * Add a tower to the map
      *
      * @param tower tower
      */
-    addTowerToMap(tower: Tower) {
+    private _addTowerToMap(tower: Tower) {
         const { x, y } = tower.position;
         this._contentsMap[x][y] = tower;
         this._children.push(tower);

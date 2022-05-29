@@ -1,25 +1,29 @@
 import { Position } from "./Position";
-import type { Game } from "../Game";
 import { GameObject } from "./GameObject";
+import { TowerStatus } from "../types";
+import type { GameBoard } from "./GameBoard";
 
 /**
  * An individual tower
  */
 export class Tower extends GameObject {
-    private _game: Game;
+    private _gameBoard: GameBoard;
     private _position: Position;
     private _range = 2;
     private _cellsInRange: Position[] = [];
+    private _towerStatus = TowerStatus.building;
+    private _elapsedTime = 0;
+    private _builtTime = -10 * 1000;
 
     /**
      * Initialize a tower
      *
-     * @param game - the game
+     * @param gameBoard - the gameBoard
      * @param position - where the tower is
      */
-    constructor(game: Game, position: Position) {
+    constructor(gameBoard: GameBoard, position: Position) {
         super();
-        this._game = game;
+        this._gameBoard = gameBoard;
         this._position = position;
 
         // Determine which cells are in range:
@@ -34,7 +38,7 @@ export class Tower extends GameObject {
                 j++
             ) {
                 const tile = new Position(i, j);
-                if (this._game.gameBoard.isValidPosition(tile)) {
+                if (this._gameBoard.isValidPosition(tile)) {
                     this._cellsInRange.push(tile);
                 }
             }
@@ -48,9 +52,28 @@ export class Tower extends GameObject {
         return this._position;
     }
 
-    // update() {
-    // Get a list of enemies present on the range of cells
+    /**
+     * Tower's status
+     */
+    get towerStatus(): TowerStatus {
+        return this._towerStatus;
+    }
 
-    // If there are any, pick the first enemy, and fire an event
-    // }
+    /**
+     * On frame change
+     *
+     * @param delta seconds passed
+     */
+    update(delta: number) {
+        this._elapsedTime += delta;
+
+        if (this._towerStatus === TowerStatus.building) {
+            if (this._elapsedTime < this._builtTime) {
+                this._towerStatus = TowerStatus.active;
+            }
+        }
+        // Get a list of enemies present on the range of cells
+
+        // If there are any, pick the first enemy, and fire an event
+    }
 }
