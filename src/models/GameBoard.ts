@@ -1,3 +1,4 @@
+import type { Game } from "../Game";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
 import { Tower } from "./Tower";
@@ -108,10 +109,11 @@ export class GameBoard extends GameObject {
     /**
      * Build a tower
      *
-     * @param position location of tower
+     * @param game - the game
+     * @param position - location of tower
      */
-    buildTower(position: Position): void {
-        const tower = new Tower(this, position);
+    buildTower(game: Game, position: Position): void {
+        const tower = new Tower(game, this, position);
         this._addTowerToMap(tower);
     }
 

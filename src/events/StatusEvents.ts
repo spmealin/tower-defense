@@ -1,6 +1,7 @@
 import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
-import type { audioCodeOptions } from "../types";
+import type { Tower } from "../models/Tower";
+import type { audioCodeOptions, TowerEventType } from "../types";
 
 /**
  * An event for when an Observer moves.
@@ -25,6 +26,25 @@ export class ObserverMovedEvent {
         this.observer = observer;
         this.oldPosition = oldPosition;
         this.newPosition = newPosition;
+    }
+}
+
+/**
+ * Event called by a tower
+ */
+export class TowerEvent {
+    readonly tower: Tower;
+    readonly type: TowerEventType;
+
+    /**
+     * Create a new TowerEvent event.
+     *
+     * @param origin - originating tower
+     * @param type - type of event
+     */
+    constructor(origin: Tower, type: TowerEventType) {
+        this.tower = origin;
+        this.type = type;
     }
 }
 

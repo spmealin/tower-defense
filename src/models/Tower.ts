@@ -1,12 +1,15 @@
 import { Position } from "./Position";
 import { GameObject } from "./GameObject";
-import { TowerStatus } from "../types";
+import { TowerEventType, TowerStatus } from "../types";
 import type { GameBoard } from "./GameBoard";
+import type { Game } from "../Game";
+import { TowerEvent } from "../events/StatusEvents";
 
 /**
  * An individual tower
  */
 export class Tower extends GameObject {
+    private _game: Game;
     private _gameBoard: GameBoard;
     private _position: Position;
     private _range = 2;
@@ -21,11 +24,13 @@ export class Tower extends GameObject {
     /**
      * Initialize a tower
      *
+     * @param game - the game
      * @param gameBoard - the gameBoard
      * @param position - where the tower is
      */
-    constructor(gameBoard: GameBoard, position: Position) {
+    constructor(game: Game, gameBoard: GameBoard, position: Position) {
         super();
+        this._game = game;
         this._gameBoard = gameBoard;
         this._position = position;
 
@@ -46,6 +51,10 @@ export class Tower extends GameObject {
                 }
             }
         }
+
+        this._game.eventBus.raiseEvent(
+            new TowerEvent(this, TowerEventType.placed)
+        );
     }
 
     /**
@@ -87,8 +96,18 @@ export class Tower extends GameObject {
         if (this._towerStatus === TowerStatus.building) {
             if (this._elapsedTime < this._builtTime) {
                 this._towerStatus = TowerStatus.active;
+
+                this._game.eventBus.raiseEvent(
+                    new TowerEvent(this, TowerEventType.finishedBuilding)
+                );
             }
+
+            // If the tower is building, or just finished building,
+            // it should wait another frame before trying to do things,
+            // like fire on enemies.
+            return;
         }
+
         // Get a list of enemies present on the range of cells
 
         // If there are any, pick the first enemy, and fire an event

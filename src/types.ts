@@ -13,3 +13,13 @@ export enum TowerStatus {
     active,
     dead
 }
+
+/**
+ * Types of events called by a tower
+ */
+export enum TowerEventType {
+    placed,
+    finishedBuilding,
+    firing,
+    died
+}
