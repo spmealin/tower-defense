@@ -5,6 +5,8 @@ import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
 import { Position } from "./models/Position";
 
+const ENEMY_SPAWN_RATE = 10000; // Spawn a new enemy every 10s
+
 /**
  * The main game.
  */
@@ -12,7 +14,7 @@ export class Game extends GameObject {
     private readonly _gameBoard;
     private readonly _eventBus;
     private _elapsedGameTime = 0;
-    private _enemy: Enemy | null = null;
+    private _lastEnemySpawn = 0;
 
     /**
      * Create a game object.
@@ -60,15 +62,17 @@ export class Game extends GameObject {
      */
     update = (delta: number) => {
         this._elapsedGameTime += delta;
+        this._lastEnemySpawn += delta;
         this._eventBus.dispatchEvents();
-        if (!this._enemy) {
-            this._enemy = new Enemy(
+        if (this._lastEnemySpawn >= ENEMY_SPAWN_RATE) {
+            this._lastEnemySpawn = 0;
+            const enemy = new Enemy(
                 this._gameBoard,
                 this._eventBus,
                 new Position(25, 0),
                 new HardCodedPath()
             );
-            this._gameBoard.addEnemy?.(this._enemy);
+            this._gameBoard.addEnemy?.(enemy);
         }
         super.update(delta);
     };

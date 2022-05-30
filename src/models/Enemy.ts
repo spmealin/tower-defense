@@ -1,10 +1,11 @@
 import type { HardCodedPath } from "../ai/HardCodedPath";
 import type { EventBus } from "../events/EventBus";
-import { EnemyEvent } from "../events/StatusEvents";
+import { AttackEvent, EnemyEvent } from "../events/StatusEvents";
 import { EnemyEventType } from "../types";
 import type { GameBoard } from "./GameBoard";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
+import { Tower } from "./Tower";
 
 /** How long it takes for an enemy to cross a position in milliseconds */
 const SPEED = 3000;
@@ -19,6 +20,7 @@ export class Enemy extends GameObject {
     private _position: Position;
     private _timeSinceLastMovement = SPEED;
     private _health = 100;
+    private _attack = 15;
 
     /**
      * Create an enemy.
@@ -79,6 +81,9 @@ export class Enemy extends GameObject {
      * @param delta - the time since update was last called in milliseconds
      */
     update(delta: number): void {
+        if (this._health < 0) {
+            return;
+        }
         this._timeSinceLastMovement -= Math.abs(delta);
         if (this._timeSinceLastMovement <= 0) {
             const newPosition = this._path.nextPositionOnPath(this._position);
@@ -96,10 +101,17 @@ export class Enemy extends GameObject {
      * @param newPosition - the new position to move to
      */
     private _updatePosition(newPosition: Position) {
+        this._timeSinceLastMovement = SPEED;
         if (this._gameBoard.moveGameObject(this._position, newPosition)) {
             // We moved.
             this._position = newPosition;
-            this._timeSinceLastMovement = SPEED;
+        } else {
+            const blockage = this._gameBoard.getContents(newPosition);
+            if (blockage instanceof Tower) {
+                this._eventBus.raiseEvent(
+                    new AttackEvent(this, blockage, this._attack)
+                );
+            }
         }
     }
 }
