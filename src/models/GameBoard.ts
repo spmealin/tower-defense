@@ -1,4 +1,6 @@
+import { GameObjectMovedEvent } from "../events/StatusEvents";
 import type { Game } from "../Game";
+import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
 import { Tower } from "./Tower";
@@ -27,16 +29,20 @@ const Y_MAX = 51;
  * The game board where everything happens.
  */
 export class GameBoard extends GameObject {
+    private readonly _game: Game;
     private readonly _terrainMap: Terrain[][];
     private readonly _boardWidth = X_MAX;
     private readonly _boardHeight = Y_MAX;
-    private _contentsMap: (Tower | null)[][] = [];
+    private _contentsMap: (GameObject | null)[][] = [];
 
     /**
      * Create a GameBoard.
+     *
+     * @param game - the game that this board is associated with
      */
-    constructor() {
+    constructor(game: Game) {
         super();
+        this._game = game;
         this._terrainMap = [];
         this._createEmptyContentsMap();
     }
@@ -62,7 +68,7 @@ export class GameBoard extends GameObject {
      */
     _createEmptyContentsMap() {
         for (let i = 0; i < this._boardWidth; i++) {
-            const temp: (Tower | null)[] = [];
+            const temp: (GameObject | null)[] = [];
             for (let j = 0; j < this._boardHeight; j++) {
                 temp.push(null);
             }
@@ -94,7 +100,7 @@ export class GameBoard extends GameObject {
      * @param p position on map
      * @returns the item on the cell (null if nothing)
      */
-    getContents(p: Position): Tower | null {
+    getContents(p: Position): GameObject | null {
         if (
             p.x < 0 ||
             p.y < 0 ||
@@ -109,23 +115,60 @@ export class GameBoard extends GameObject {
     /**
      * Build a tower
      *
-     * @param game - the game
      * @param position - location of tower
      */
-    buildTower(game: Game, position: Position): void {
-        const tower = new Tower(game, this, position);
-        this._addTowerToMap(tower);
+    buildTower(position: Position): void {
+        const tower = new Tower(this._game, this, position);
+        this._addGameObjectToMap(tower);
     }
 
     /**
-     * Add a tower to the map
+     * Add an enemy to the map.
+     * TODO: this does not do any error checking, fix that at some point so we cannot add enemies on top of each other.
      *
-     * @param tower tower
+     * @param enemy - the enemy to add
      */
-    private _addTowerToMap(tower: Tower) {
-        const { x, y } = tower.position;
-        this._contentsMap[x][y] = tower;
-        this._children.push(tower);
+    addEnemy(enemy: Enemy): void {
+        this._addGameObjectToMap(enemy);
+    }
+
+    /**
+     * Add a game object to the map
+     *
+     * @param gameObject - the object to add
+     */
+    private _addGameObjectToMap(gameObject: Tower | Enemy | GameObject) {
+        if ("position" in gameObject) {
+            const { x, y } = gameObject.position;
+            this._contentsMap[x][y] = gameObject;
+        }
+        this._children.push(gameObject);
+    }
+
+    /**
+     * Move a game object from one position to another.
+     * There must be a game object at the provided position and the new position must be empty for this to succeed.
+     *
+     * @param currentPosition - the position of the object to move
+     * @param newPosition - the new position to move to
+     * @returns true if the object was moved, false otherwise
+     */
+    moveGameObject(currentPosition: Position, newPosition: Position): boolean {
+        const obj = this._contentsMap[currentPosition.x][currentPosition.y];
+        if (!obj) {
+            // We cannot move an empty object.
+            return false;
+        }
+        if (this._contentsMap[newPosition.x][newPosition.y]) {
+            // We cannot move to a place that already has an object in it.
+            return false;
+        }
+        this._contentsMap[newPosition.x][newPosition.y] = obj;
+        this._contentsMap[currentPosition.x][currentPosition.y] = null;
+        this._game.eventBus.raiseEvent(
+            new GameObjectMovedEvent(obj, currentPosition, newPosition)
+        );
+        return true;
     }
 
     /**

@@ -1,6 +1,9 @@
+import { HardCodedPath } from "./ai/HardCodedPath";
 import { EventBus } from "./events/EventBus";
+import { Enemy } from "./models/Enemy";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
+import { Position } from "./models/Position";
 
 /**
  * The main game.
@@ -9,13 +12,14 @@ export class Game extends GameObject {
     private readonly _gameBoard;
     private readonly _eventBus;
     private _elapsedGameTime = 0;
+    private _enemy: Enemy | null = null;
 
     /**
      * Create a game object.
      */
     constructor() {
         super();
-        this._gameBoard = new GameBoard();
+        this._gameBoard = new GameBoard(this);
         this._eventBus = new EventBus();
         this._children.push(this._gameBoard);
     }
@@ -57,6 +61,15 @@ export class Game extends GameObject {
     update = (delta: number) => {
         this._elapsedGameTime += delta;
         this._eventBus.dispatchEvents();
+        if (!this._enemy) {
+            this._enemy = new Enemy(
+                this._gameBoard,
+                this._eventBus,
+                new Position(25, 0),
+                new HardCodedPath()
+            );
+            this._gameBoard.addEnemy(this._enemy);
+        }
         super.update(delta);
     };
 }

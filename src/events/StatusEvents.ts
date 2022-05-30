@@ -1,3 +1,4 @@
+import type { GameObject } from "../models/GameObject";
 import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
 import type { Tower } from "../models/Tower";
@@ -154,5 +155,31 @@ export class UIStatusSoundEvent {
      */
     get adjustment(): number {
         return this._adjustment;
+    }
+}
+
+/**
+ * An event for when a game object moves on the game board.
+ */
+export class GameObjectMovedEvent {
+    readonly gameObject: GameObject;
+    readonly oldPosition: Position;
+    readonly newPosition: Position;
+
+    /**
+     * Create a new GameObjectMovedEvent event.
+     *
+     * @param object - the game object that moved
+     * @param oldPosition - where the game object moved from
+     * @param newPosition - where the game object moved to
+     */
+    constructor(
+        object: GameObject,
+        oldPosition: Position,
+        newPosition: Position
+    ) {
+        this.gameObject = object;
+        this.oldPosition = oldPosition;
+        this.newPosition = newPosition;
     }
 }

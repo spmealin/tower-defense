@@ -3,7 +3,9 @@ import {
     UIStatusMessageEvent
 } from "../../events/StatusEvents";
 import type { Game } from "../../Game";
-import type { Tower } from "../../models/Tower";
+import { Enemy } from "../../models/Enemy";
+import type { GameObject } from "../../models/GameObject";
+import { Tower } from "../../models/Tower";
 import { TowerStatus } from "../../types";
 
 /**
@@ -12,17 +14,27 @@ import { TowerStatus } from "../../types";
  * @param contents contents of a tile
  * @returns description
  */
-function describeContents(contents: Tower | null): string {
-    if (contents === null) {
+function describeContents(contents: GameObject | null): string {
+    if (!contents) {
         return "";
     }
 
-    if (contents.towerStatus === TowerStatus.building) {
+    if (
+        contents instanceof Tower &&
+        contents.towerStatus === TowerStatus.building
+    ) {
         return "building tower";
     }
 
-    if (contents.towerStatus === TowerStatus.active) {
+    if (
+        contents instanceof Tower &&
+        contents.towerStatus === TowerStatus.active
+    ) {
         return `Tower, ${Math.floor(contents.healthAsPercent * 100)}%`;
+    }
+
+    if (contents instanceof Enemy) {
+        return "Enemy.";
     }
 
     return "unknown";

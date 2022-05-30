@@ -1,5 +1,7 @@
 import type { Game } from "../../Game";
+import { Enemy } from "../../models/Enemy";
 import type { Position } from "../../models/Position";
+import { Tower } from "../../models/Tower";
 import { TowerStatus } from "../../types";
 
 const VISUAL_WIDTH = 800;
@@ -81,9 +83,16 @@ export class Artist {
         );
 
         const contentsOfTile = this._game.gameBoard.getContents(pos);
-        if (contentsOfTile !== null) {
+        if (contentsOfTile instanceof Tower) {
             ctx.strokeText(
                 contentsOfTile.towerStatus === TowerStatus.building ? "t" : "T",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        }
+        if (contentsOfTile instanceof Enemy) {
+            ctx.strokeText(
+                "E",
                 (pos.x + 0.3) * this._cellWidth,
                 (50 - pos.y + 0.7) * this._cellHeight
             );
