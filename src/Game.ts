@@ -19,8 +19,8 @@ export class Game extends GameObject {
      */
     constructor() {
         super();
-        this._gameBoard = new GameBoard(this);
         this._eventBus = new EventBus();
+        this._gameBoard = new GameBoard(this);
         this._children.push(this._gameBoard);
     }
 
@@ -68,7 +68,7 @@ export class Game extends GameObject {
                 new Position(25, 0),
                 new HardCodedPath()
             );
-            this._gameBoard.addEnemy(this._enemy);
+            this._gameBoard.addEnemy?.(this._enemy);
         }
         super.update(delta);
     };

@@ -1,5 +1,11 @@
-import { GameObjectMovedEvent } from "../events/StatusEvents";
+import {
+    AttackEvent,
+    EnemyEvent,
+    GameObjectMovedEvent,
+    TowerEvent
+} from "../events/StatusEvents";
 import type { Game } from "../Game";
+import { EnemyEventType, TowerEventType } from "../types";
 import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
@@ -45,6 +51,7 @@ export class GameBoard extends GameObject {
         this._game = game;
         this._terrainMap = [];
         this._createEmptyContentsMap();
+        this._startListening();
     }
 
     /**
@@ -61,6 +68,37 @@ export class GameBoard extends GameObject {
             }
             this._terrainMap.push(col);
         }
+    }
+
+    /**
+     * Start listening for relevant events
+     */
+    _startListening() {
+        this._game.eventBus.addEventHandler(
+            AttackEvent,
+            (event: AttackEvent) => {
+                this._handleAttackEvent(event);
+            }
+        );
+        this._game.eventBus.addEventHandler(TowerEvent, (event: TowerEvent) => {
+            if (event.type === TowerEventType.died) {
+                this.clearPosition(event.tower.position);
+            }
+        });
+        this._game.eventBus.addEventHandler(EnemyEvent, (event: EnemyEvent) => {
+            if (event.type === EnemyEventType.died) {
+                this.clearPosition(event.enemy.position);
+            }
+        });
+    }
+
+    /**
+     * Handle an attack
+     *
+     * @param event - Attack Event
+     */
+    _handleAttackEvent(event: AttackEvent) {
+        event.target.getHit(event.attackPoints);
     }
 
     /**
@@ -100,7 +138,7 @@ export class GameBoard extends GameObject {
      * @param p position on map
      * @returns the item on the cell (null if nothing)
      */
-    getContents(p: Position): GameObject | null {
+    getContents(p: Position): GameObject | Tower | Enemy | null {
         if (
             p.x < 0 ||
             p.y < 0 ||
@@ -120,6 +158,16 @@ export class GameBoard extends GameObject {
     buildTower(position: Position): void {
         const tower = new Tower(this._game, this, position);
         this._addGameObjectToMap(tower);
+    }
+
+    /**
+     * Remove object from map
+     *
+     * @param position - position
+     */
+    clearPosition(position: Position): void {
+        const { x, y } = position;
+        this._contentsMap[x][y] = null;
     }
 
     /**

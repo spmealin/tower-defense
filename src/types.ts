@@ -23,3 +23,11 @@ export enum TowerEventType {
     firing,
     died
 }
+
+/**
+ * Types of events called by an enemy
+ */
+export enum EnemyEventType {
+    active,
+    died
+}

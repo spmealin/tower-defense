@@ -1,5 +1,7 @@
 import type { HardCodedPath } from "../ai/HardCodedPath";
 import type { EventBus } from "../events/EventBus";
+import { EnemyEvent } from "../events/StatusEvents";
+import { EnemyEventType } from "../types";
 import type { GameBoard } from "./GameBoard";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
@@ -16,6 +18,7 @@ export class Enemy extends GameObject {
     private readonly _eventBus: EventBus;
     private _position: Position;
     private _timeSinceLastMovement = SPEED;
+    private _health = 100;
 
     /**
      * Create an enemy.
@@ -45,6 +48,29 @@ export class Enemy extends GameObject {
      */
     get position(): Position {
         return this._position;
+    }
+
+    /**
+     * Current health of enemy
+     *
+     * @readonly
+     */
+    get health(): number {
+        return this._health;
+    }
+
+    /**
+     * Get hit
+     *
+     * @param attackPoints - points the enemy was attacked with
+     */
+    getHit(attackPoints: number): void {
+        this._health -= attackPoints;
+        if (this._health < 0) {
+            this._eventBus.raiseEvent(
+                new EnemyEvent(this, EnemyEventType.died)
+            );
+        }
     }
 
     /**

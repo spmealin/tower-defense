@@ -1,8 +1,13 @@
+import type { Enemy } from "../models/Enemy";
 import type { GameObject } from "../models/GameObject";
 import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
 import type { Tower } from "../models/Tower";
-import type { audioCodeOptions, TowerEventType } from "../types";
+import type {
+    audioCodeOptions,
+    EnemyEventType,
+    TowerEventType
+} from "../types";
 import type { ErrorMessage } from "./ErrorMessages";
 
 /**
@@ -46,6 +51,51 @@ export class TowerEvent {
      */
     constructor(origin: Tower, type: TowerEventType) {
         this.tower = origin;
+        this.type = type;
+    }
+}
+
+/**
+ * Attack event, called by an enemy or a tower
+ */
+export class AttackEvent {
+    readonly origin: Tower | Enemy;
+    readonly target: Tower | Enemy;
+    readonly attackPoints: number;
+
+    /**
+     * Create a new AttackEvent
+     *
+     * @param origin - who fired
+     * @param target - who is being fired on
+     * @param attackPoints - the attack power
+     */
+    constructor(
+        origin: Tower | Enemy,
+        target: Enemy | Tower,
+        attackPoints: number
+    ) {
+        this.origin = origin;
+        this.target = target;
+        this.attackPoints = attackPoints;
+    }
+}
+
+/**
+ * Event called by an enemy
+ */
+export class EnemyEvent {
+    readonly enemy: Enemy;
+    readonly type: EnemyEventType;
+
+    /**
+     * Create a new EnemyEvent
+     *
+     * @param enemy - relevant enemy
+     * @param type - event type
+     */
+    constructor(enemy: Enemy, type: EnemyEventType) {
+        this.enemy = enemy;
         this.type = type;
     }
 }

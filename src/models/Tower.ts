@@ -3,7 +3,8 @@ import { GameObject } from "./GameObject";
 import { TowerEventType, TowerStatus } from "../types";
 import type { GameBoard } from "./GameBoard";
 import type { Game } from "../Game";
-import { TowerEvent } from "../events/StatusEvents";
+import { AttackEvent, TowerEvent } from "../events/StatusEvents";
+import { Enemy } from "./Enemy";
 
 /**
  * An individual tower
@@ -20,6 +21,7 @@ export class Tower extends GameObject {
     private readonly _startingHealth = 100;
     private _health = this._startingHealth;
     private _attack = 10;
+    private _timeSinceFiring = 0;
 
     /**
      * Initialize a tower
@@ -92,6 +94,7 @@ export class Tower extends GameObject {
      */
     update(delta: number) {
         this._elapsedTime += delta;
+        this._timeSinceFiring += delta;
 
         if (this._towerStatus === TowerStatus.building) {
             if (this._elapsedTime > this._builtTime) {
@@ -108,8 +111,41 @@ export class Tower extends GameObject {
             return;
         }
 
-        // Get a list of enemies present on the range of cells
+        if (this._timeSinceFiring >= 1000) {
+            // Get a list of all enemies in range
+            const enemies: Enemy[] = [];
+            for (let i = 0; i < this._cellsInRange.length; i++) {
+                const cell = this._gameBoard.getContents(this._cellsInRange[i]);
+                if (cell instanceof Enemy) {
+                    enemies.push(cell);
+                }
+            }
 
-        // If there are any, pick the first enemy, and fire an event
+            // If there are no enemies in range, there's nothing to do
+            if (enemies.length === 0) {
+                return;
+            }
+
+            // If there are any, pick the first enemy, and fire an event
+            const target = enemies[0];
+            this._game.eventBus.raiseEvent(
+                new AttackEvent(this, target, this._attack)
+            );
+            this._timeSinceFiring = 0;
+        }
+    }
+
+    /**
+     * Get hit
+     *
+     * @param attackPoints - points the enemy was attacked with
+     */
+    getHit(attackPoints: number): void {
+        this._health -= attackPoints;
+        if (this._health < 0) {
+            this._game.eventBus.raiseEvent(
+                new TowerEvent(this, TowerEventType.died)
+            );
+        }
     }
 }

@@ -34,7 +34,7 @@ function describeContents(contents: GameObject | null): string {
     }
 
     if (contents instanceof Enemy) {
-        return "Enemy.";
+        return `Enemy, ${contents.health} HP.`;
     }
 
     return "unknown";
