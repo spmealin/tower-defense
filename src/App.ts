@@ -15,7 +15,11 @@ import { ScreenReaderBridge } from "./ui/ScreenReaderBridge";
 import { Artist } from "./ui/visuals/Artist";
 import { VisualManager } from "./ui/visuals/VisualManager";
 
-const levelMapFiles = ["./maps/loop.txt", "./maps/zigzag.txt"];
+const levelMapFiles = [
+    "./maps/straight.txt"
+    // "./maps/loop.txt",
+    // "./maps/zigzag.txt"
+];
 
 /**
  * Return a random item from an array
