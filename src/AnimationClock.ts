@@ -50,7 +50,7 @@ export class AnimationClock {
      */
     _handleNewFrame(time: DOMHighResTimeStamp): void {
         if (this._lastFrameTime) {
-            const delta = this._lastFrameTime - time;
+            const delta = time - this._lastFrameTime;
             this._callback(delta);
             this._lastFrameTime = time;
         } else {

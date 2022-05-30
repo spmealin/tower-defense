@@ -16,7 +16,7 @@ export class Tower extends GameObject {
     private _cellsInRange: Position[] = [];
     private _towerStatus = TowerStatus.building;
     private _elapsedTime = 0;
-    private _builtTime = -10 * 1000;
+    private _builtTime = 10 * 1000;
     private readonly _startingHealth = 100;
     private _health = this._startingHealth;
     private _attack = 10;
@@ -94,7 +94,7 @@ export class Tower extends GameObject {
         this._elapsedTime += delta;
 
         if (this._towerStatus === TowerStatus.building) {
-            if (this._elapsedTime < this._builtTime) {
+            if (this._elapsedTime > this._builtTime) {
                 this._towerStatus = TowerStatus.active;
 
                 this._game.eventBus.raiseEvent(

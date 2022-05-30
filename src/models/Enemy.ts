@@ -53,7 +53,6 @@ export class Enemy extends GameObject {
      * @param delta - the time since update was last called in milliseconds
      */
     update(delta: number): void {
-        // TODO: fix this math since it thinks delta is negative.
         this._timeSinceLastMovement -= Math.abs(delta);
         if (this._timeSinceLastMovement <= 0) {
             const newPosition = this._path.nextPositionOnPath(this._position);
