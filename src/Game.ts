@@ -1,6 +1,7 @@
 import { EventBus } from "./events/EventBus";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
+import { PointManager } from "./models/PointManager";
 
 /**
  * The main game.
@@ -8,6 +9,7 @@ import { GameObject } from "./models/GameObject";
 export class Game extends GameObject {
     private readonly _gameBoard;
     private readonly _eventBus;
+    private readonly _pointManager;
     private _elapsedGameTime = 0;
 
     /**
@@ -17,6 +19,7 @@ export class Game extends GameObject {
         super();
         this._gameBoard = new GameBoard();
         this._eventBus = new EventBus();
+        this._pointManager = new PointManager(this, 100);
         this._children.push(this._gameBoard);
     }
 
@@ -36,6 +39,15 @@ export class Game extends GameObject {
      */
     get eventBus(): EventBus {
         return this._eventBus;
+    }
+
+    /**
+     * Get the point manager for this game
+     *
+     * @readonly
+     */
+    get pointManager(): PointManager {
+        return this.pointManager;
     }
 
     /**

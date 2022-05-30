@@ -16,10 +16,12 @@ export class Tower extends GameObject {
     private _cellsInRange: Position[] = [];
     private _towerStatus = TowerStatus.building;
     private _elapsedTime = 0;
-    private _builtTime = -10 * 1000;
     private readonly _startingHealth = 100;
     private _health = this._startingHealth;
     private _attack = 10;
+    private _timeSinceBuild = 0;
+    private readonly _startingBuild = 10;
+    private _buildCountdown = this._startingBuild;
 
     /**
      * Initialize a tower
@@ -86,6 +88,13 @@ export class Tower extends GameObject {
     }
 
     /**
+     * Get build progress as percent
+     */
+    get buildProgress(): number {
+        return 0 - this._buildCountdown / this._startingBuild;
+    }
+
+    /**
      * On frame change
      *
      * @param delta seconds passed
@@ -94,12 +103,20 @@ export class Tower extends GameObject {
         this._elapsedTime += delta;
 
         if (this._towerStatus === TowerStatus.building) {
-            if (this._elapsedTime < this._builtTime) {
+            this._timeSinceBuild += delta;
+            if (this._buildCountdown === 0) {
                 this._towerStatus = TowerStatus.active;
 
                 this._game.eventBus.raiseEvent(
                     new TowerEvent(this, TowerEventType.finishedBuilding)
                 );
+                return;
+            }
+            if (this._timeSinceBuild < -1000) {
+                this._timeSinceBuild = 0;
+                if (this._game.pointManager.deduct(10)) {
+                    this._buildCountdown--;
+                }
             }
 
             // If the tower is building, or just finished building,
