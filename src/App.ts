@@ -187,6 +187,13 @@ function handlerInit(): void {
         },
         KeyTransition.KeyPressed
     );
+    keyboardManager.addHandler(
+        keys.SPACEBAR,
+        () => {
+            observer.refresh();
+        },
+        KeyTransition.KeyPressed
+    );
 }
 
 /**

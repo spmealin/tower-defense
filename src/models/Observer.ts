@@ -114,6 +114,13 @@ export class Observer {
     }
 
     /**
+     * Restate current status
+     */
+    refresh(): void {
+        this._moveIfValidPosition(this._position);
+    }
+
+    /**
      * Move to the new position if possible.
      *
      * @param p - the new position to move to
