@@ -137,8 +137,10 @@ export class GameBoard extends GameObject {
      * @param position - location of tower
      */
     buildTower(position: Position): void {
-        const tower = new Tower(this._game, position);
-        this._addGameObjectToMap(tower);
+        if (!this.getContents(position)) {
+            const tower = new Tower(this._game, position);
+            this._addGameObjectToMap(tower);
+        }
     }
 
     /**
