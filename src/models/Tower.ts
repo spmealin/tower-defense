@@ -61,6 +61,17 @@ export class Tower extends GameObject {
     }
 
     /**
+     * Destroy this tower.
+     */
+    destroy(): void {
+        this._game.eventBus.removeEventHandler(
+            AttackEvent,
+            this._handleAttackEvent
+        );
+        super.destroy();
+    }
+
+    /**
      * The position of the tower
      */
     get position(): Position {
@@ -100,15 +111,16 @@ export class Tower extends GameObject {
         if (this._towerStatus === TowerStatus.building) {
             if (this._elapsedTime > this._builtTime) {
                 this._towerStatus = TowerStatus.active;
-
                 this._game.eventBus.raiseEvent(
                     new TowerEvent(this, TowerEventType.finishedBuilding)
                 );
             }
-
             // If the tower is building, or just finished building,
             // it should wait another frame before trying to do things,
             // like fire on enemies.
+            return;
+        } else if (this._towerStatus === TowerStatus.dead) {
+            this._game.gameBoard.destroyChild(this);
             return;
         }
 
@@ -150,6 +162,7 @@ export class Tower extends GameObject {
                 this._game.eventBus.raiseEvent(
                     new TowerEvent(this, TowerEventType.died)
                 );
+                this._towerStatus = TowerStatus.dead;
             }
         }
     };

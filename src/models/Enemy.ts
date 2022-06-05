@@ -45,6 +45,14 @@ export class Enemy extends GameObject {
     }
 
     /**
+     * Clean up this enemy when it is being destroied.
+     */
+    destroy(): void {
+        this._eventBus.removeEventHandler(AttackEvent, this._handleAttackEvent);
+        super.destroy();
+    }
+
+    /**
      *Get the position of this enemy.
      *
      * @readonly
@@ -85,9 +93,10 @@ export class Enemy extends GameObject {
      */
     update(delta: number): void {
         if (this._health < 0) {
+            this._gameBoard.destroyChild(this);
             return;
         }
-        this._timeSinceLastMovement -= Math.abs(delta);
+        this._timeSinceLastMovement -= delta;
         if (this._timeSinceLastMovement <= 0) {
             const newPosition = this._path.nextPositionOnPath(this._position);
             if (newPosition) {
