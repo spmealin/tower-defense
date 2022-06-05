@@ -41,6 +41,7 @@ export class Enemy extends GameObject {
         this._eventBus = eventBus;
         this._path = path;
         this._position = position;
+        this._eventBus.addEventHandler(AttackEvent, this._handleAttackEvent);
     }
 
     /**
@@ -62,18 +63,20 @@ export class Enemy extends GameObject {
     }
 
     /**
-     * Get hit
+     * Handle attack events.
      *
-     * @param attackPoints - points the enemy was attacked with
+     * @param event - the event
      */
-    getHit(attackPoints: number): void {
-        this._health -= attackPoints;
-        if (this._health < 0) {
-            this._eventBus.raiseEvent(
-                new EnemyEvent(this, EnemyEventType.died)
-            );
+    private _handleAttackEvent = (event: AttackEvent) => {
+        if (event.target === this) {
+            this._health -= event.attackPoints;
+            if (this._health < 0) {
+                this._eventBus.raiseEvent(
+                    new EnemyEvent(this, EnemyEventType.died)
+                );
+            }
         }
-    }
+    };
 
     /**
      * Update the enemy.

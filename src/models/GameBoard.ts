@@ -1,5 +1,4 @@
 import {
-    AttackEvent,
     EnemyEvent,
     GameObjectMovedEvent,
     TowerEvent
@@ -84,12 +83,6 @@ export class GameBoard extends GameObject {
      * Start listening for relevant events
      */
     _startListening() {
-        this._game.eventBus.addEventHandler(
-            AttackEvent,
-            (event: AttackEvent) => {
-                this._handleAttackEvent(event);
-            }
-        );
         this._game.eventBus.addEventHandler(TowerEvent, (event: TowerEvent) => {
             if (event.type === TowerEventType.died) {
                 this.clearPosition(event.tower.position);
@@ -100,15 +93,6 @@ export class GameBoard extends GameObject {
                 this.clearPosition(event.enemy.position);
             }
         });
-    }
-
-    /**
-     * Handle an attack
-     *
-     * @param event - Attack Event
-     */
-    _handleAttackEvent(event: AttackEvent) {
-        event.target.getHit(event.attackPoints);
     }
 
     /**
@@ -153,7 +137,7 @@ export class GameBoard extends GameObject {
      * @param position - location of tower
      */
     buildTower(position: Position): void {
-        const tower = new Tower(this._game, this, position);
+        const tower = new Tower(this._game, position);
         this._addGameObjectToMap(tower);
     }
 

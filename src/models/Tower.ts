@@ -1,7 +1,6 @@
 import { Position } from "./Position";
 import { GameObject } from "./GameObject";
 import { TowerEventType, TowerStatus } from "../types";
-import type { GameBoard } from "./GameBoard";
 import type { Game } from "../Game";
 import { AttackEvent, TowerEvent } from "../events/StatusEvents";
 import { Enemy } from "./Enemy";
@@ -11,7 +10,6 @@ import { Enemy } from "./Enemy";
  */
 export class Tower extends GameObject {
     private _game: Game;
-    private _gameBoard: GameBoard;
     private _position: Position;
     private _range = 2;
     private _cellsInRange: Position[] = [];
@@ -27,13 +25,11 @@ export class Tower extends GameObject {
      * Initialize a tower
      *
      * @param game - the game
-     * @param gameBoard - the gameBoard
      * @param position - where the tower is
      */
-    constructor(game: Game, gameBoard: GameBoard, position: Position) {
+    constructor(game: Game, position: Position) {
         super();
         this._game = game;
-        this._gameBoard = gameBoard;
         this._position = position;
 
         // Determine which cells are in range:
@@ -48,7 +44,7 @@ export class Tower extends GameObject {
                 j++
             ) {
                 const tile = new Position(i, j);
-                if (this._gameBoard.isValidPosition(tile)) {
+                if (this._game.gameBoard.isValidPosition(tile)) {
                     this._cellsInRange.push(tile);
                 }
             }
@@ -56,6 +52,11 @@ export class Tower extends GameObject {
 
         this._game.eventBus.raiseEvent(
             new TowerEvent(this, TowerEventType.placed)
+        );
+
+        this._game.eventBus.addEventHandler(
+            AttackEvent,
+            this._handleAttackEvent
         );
     }
 
@@ -115,7 +116,9 @@ export class Tower extends GameObject {
             // Get a list of all enemies in range
             const enemies: Enemy[] = [];
             for (let i = 0; i < this._cellsInRange.length; i++) {
-                const cell = this._gameBoard.getContents(this._cellsInRange[i]);
+                const cell = this._game.gameBoard.getContents(
+                    this._cellsInRange[i]
+                );
                 if (cell instanceof Enemy) {
                     enemies.push(cell);
                 }
@@ -136,16 +139,18 @@ export class Tower extends GameObject {
     }
 
     /**
-     * Get hit
+     * Handle attack events.
      *
-     * @param attackPoints - points the enemy was attacked with
+     * @param event - the event
      */
-    getHit(attackPoints: number): void {
-        this._health -= attackPoints;
-        if (this._health < 0) {
-            this._game.eventBus.raiseEvent(
-                new TowerEvent(this, TowerEventType.died)
-            );
+    private _handleAttackEvent = (event: AttackEvent) => {
+        if (event.target === this) {
+            this._health -= event.attackPoints;
+            if (this._health < 0) {
+                this._game.eventBus.raiseEvent(
+                    new TowerEvent(this, TowerEventType.died)
+                );
+            }
         }
-    }
+    };
 }
