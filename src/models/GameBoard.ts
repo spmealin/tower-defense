@@ -219,9 +219,17 @@ export class GameBoard extends GameObject {
     }
 
     /**
-     * Get the children
+     * Get all of the towers on the board.
+     *
+     * @returns a list of the towers
      */
-    get children(): GameObject[] {
-        return this._children;
+    getAllTowers(): Tower[] {
+        const towers: Tower[] = [];
+        this._children.forEach((child) => {
+            if (child instanceof Tower) {
+                towers.push(child);
+            }
+        });
+        return towers;
     }
 }

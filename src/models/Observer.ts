@@ -4,7 +4,6 @@ import {
 } from "../events/StatusEvents";
 import type { Game } from "../Game";
 import { Position } from "./Position";
-import { Tower } from "./Tower";
 import { ErrorMessage } from "../events/ErrorMessages";
 
 /**
@@ -42,15 +41,7 @@ export class Observer {
      * Jump to next tower in the list
      */
     jumpToTower(): void {
-        const gameObjects = this._game.gameBoard.children;
-        const towers: Tower[] = [];
-
-        // I wanted to use array filter but Typescript didn't trust it
-        gameObjects.forEach((obj) => {
-            if (obj instanceof Tower) {
-                towers.push(obj);
-            }
-        });
+        const towers = this._game.gameBoard.getAllTowers();
 
         if (towers.length === 0) {
             this._game.eventBus.raiseEvent(
