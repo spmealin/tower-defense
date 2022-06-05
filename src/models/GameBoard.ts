@@ -7,7 +7,7 @@ import type { Game } from "../Game";
 import { EnemyEventType, TowerEventType } from "../types";
 import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
-import type { Position } from "./Position";
+import { Position } from "./Position";
 import { Tower } from "./Tower";
 
 /**
@@ -22,7 +22,8 @@ export const enum Terrain {
 const tileCodeMap = {
     "0": Terrain.blocked,
     "1": Terrain.road,
-    X: Terrain.home
+    X: Terrain.home,
+    S: Terrain.road
 };
 
 /**
@@ -31,9 +32,10 @@ const tileCodeMap = {
 export class GameBoard extends GameObject {
     private readonly _game: Game;
     private readonly _terrainMap: Terrain[][] = [];
+    private readonly _contentsMap: (GameObject | null)[][] = [];
     private _boardWidth = -1; // Set by the initializeBoard method
     private _boardHeight = -1; // Set by the initializeBoard method
-    private _contentsMap: (GameObject | null)[][] = [];
+    private readonly _enemySpawnPoints: Position[] = [];
 
     /**
      * Create a GameBoard.
@@ -55,12 +57,16 @@ export class GameBoard extends GameObject {
         // Get the board width and height from the number of columns and the first column.
         this._boardWidth = board.length;
         this._boardHeight = board[0].length;
-        // Create the terrain map.
+        // Create the terrain map and look for enemy spawn points.
         for (let i = 0; i < board.length; i++) {
             const col: Terrain[] = [];
             for (let j = 0; j < board[i].length; j++) {
                 const tile = board[i][j] as keyof typeof tileCodeMap;
                 col.push(tileCodeMap[tile]);
+                // TODO: using a hardcoded "S" here is going to screw us over at some point.
+                if (board[i][j] === "S") {
+                    this._enemySpawnPoints.push(new Position(i, j));
+                }
             }
             if (col.length !== this._boardHeight) {
                 throw new Error(
@@ -68,6 +74,10 @@ export class GameBoard extends GameObject {
                 );
             }
             this._terrainMap.push(col);
+        }
+        // Check that we have at least one enemy spawn point.
+        if (this._enemySpawnPoints.length === 0) {
+            throw new Error("There are no enemy spawn points on the map.");
         }
         // Create the contents of the board.
         for (let i = 0; i < this._boardWidth; i++) {
@@ -212,7 +222,7 @@ export class GameBoard extends GameObject {
     }
 
     /**
-     * Get the boardWidth
+     * Get the height of the board
      *
      * @readonly
      */
@@ -233,5 +243,14 @@ export class GameBoard extends GameObject {
             }
         });
         return towers;
+    }
+
+    /**
+     * Get a list of the enemy spawn points on the map.
+     *
+     * @readonly
+     */
+    get enemySpawnPoints(): Position[] {
+        return this._enemySpawnPoints;
     }
 }

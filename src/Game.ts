@@ -3,7 +3,6 @@ import { EventBus } from "./events/EventBus";
 import { Enemy } from "./models/Enemy";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
-import { Position } from "./models/Position";
 
 const ENEMY_SPAWN_RATE = 10000; // Spawn a new enemy every 10s
 
@@ -69,7 +68,7 @@ export class Game extends GameObject {
             const enemy = new Enemy(
                 this._gameBoard,
                 this._eventBus,
-                new Position(25, 0),
+                this._gameBoard.enemySpawnPoints[0],
                 new HardCodedPath()
             );
             this._gameBoard.addEnemy?.(enemy);
