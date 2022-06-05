@@ -50,7 +50,7 @@ export class Game extends GameObject {
      * @param board - 2D array of codes, representing aspects of the board
      */
     initialize(board: string[][]): void {
-        this._gameBoard.loadTerrainMap?.(board);
+        this._gameBoard.initializeBoard?.(board);
     }
 
     /**

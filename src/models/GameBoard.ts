@@ -26,19 +26,14 @@ const tileCodeMap = {
     X: Terrain.home
 };
 
-/** The width of the board. */
-const X_MAX = 51;
-/** The height of the board. */
-const Y_MAX = 51;
-
 /**
  * The game board where everything happens.
  */
 export class GameBoard extends GameObject {
     private readonly _game: Game;
-    private readonly _terrainMap: Terrain[][];
-    private readonly _boardWidth = X_MAX;
-    private readonly _boardHeight = Y_MAX;
+    private readonly _terrainMap: Terrain[][] = [];
+    private _boardWidth = -1; // Set by the initializeBoard method
+    private _boardHeight = -1; // Set by the initializeBoard method
     private _contentsMap: (GameObject | null)[][] = [];
 
     /**
@@ -49,8 +44,6 @@ export class GameBoard extends GameObject {
     constructor(game: Game) {
         super();
         this._game = game;
-        this._terrainMap = [];
-        this._createEmptyContentsMap();
         this._startListening();
     }
 
@@ -59,14 +52,31 @@ export class GameBoard extends GameObject {
      *
      * @param board Array from file of level design
      */
-    public loadTerrainMap(board: string[][]) {
+    public initializeBoard(board: string[][]) {
+        // Get the board width and height from the number of columns and the first column.
+        this._boardWidth = board.length;
+        this._boardHeight = board[0].length;
+        // Create the terrain map.
         for (let i = 0; i < board.length; i++) {
             const col: Terrain[] = [];
             for (let j = 0; j < board[i].length; j++) {
                 const tile = board[i][j] as keyof typeof tileCodeMap;
                 col.push(tileCodeMap[tile]);
             }
+            if (col.length !== this._boardHeight) {
+                throw new Error(
+                    `Column ${i} has a length of ${col.length} when ${this._boardHeight} was expected.`
+                );
+            }
             this._terrainMap.push(col);
+        }
+        // Create the contents of the board.
+        for (let i = 0; i < this._boardWidth; i++) {
+            const temp: (GameObject | null)[] = [];
+            for (let j = 0; j < this._boardHeight; j++) {
+                temp.push(null);
+            }
+            this._contentsMap.push(temp);
         }
     }
 
@@ -99,19 +109,6 @@ export class GameBoard extends GameObject {
      */
     _handleAttackEvent(event: AttackEvent) {
         event.target.getHit(event.attackPoints);
-    }
-
-    /**
-     * Create an empty contents map that's scaled to the size of the board
-     */
-    _createEmptyContentsMap() {
-        for (let i = 0; i < this._boardWidth; i++) {
-            const temp: (GameObject | null)[] = [];
-            for (let j = 0; j < this._boardHeight; j++) {
-                temp.push(null);
-            }
-            this._contentsMap.push(temp);
-        }
     }
 
     /**
