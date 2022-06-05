@@ -1,9 +1,7 @@
-import type { Updatable } from "../components/Updatable";
-
 /**
  * An abstract GameObject that contains logic that all game objects should have.
  */
-export abstract class GameObject implements Updatable {
+export abstract class GameObject {
     protected _children: GameObject[] = [];
 
     /**
