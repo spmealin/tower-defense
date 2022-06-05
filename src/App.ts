@@ -8,12 +8,12 @@ import { Game } from "./Game";
 import { KeyboardManager, KeyTransition } from "./input/KeyboardManager";
 import * as keys from "./input/KeyConstants";
 import { Observer } from "./models/Observer";
-import { AudioPlayer } from "./ui/AudioPlayer";
-import { AudioRenderer } from "./ui/renderers/AudioRenderer";
-import { SpeechRenderer } from "./ui/renderers/SpeechRenderer";
-import { ScreenReaderBridge } from "./ui/ScreenReaderBridge";
-import { Artist } from "./ui/visuals/Artist";
-import { VisualManager } from "./ui/visuals/VisualManager";
+import { AudioPlayer } from "./ui/audio/AudioPlayer";
+import { AudioRenderer } from "./ui/audio/AudioRenderer";
+import { SpeechRenderer } from "./ui/speech/SpeechRenderer";
+import { ScreenReaderBridge } from "./ui/speech/ScreenReaderBridge";
+import { Artist } from "./ui/visual/Artist";
+import { VisualManager } from "./ui/visual/VisualManager";
 
 const levelMapFiles = [
     "./maps/straight.txt"

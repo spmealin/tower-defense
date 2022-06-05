@@ -1,4 +1,4 @@
-import { audioCodeOptions } from "../types";
+import { audioCodeOptions } from "../../types";
 
 const boundNumber = (num: number, min: number, max: number) => {
     return Math.min(Math.max(num, min), max);
