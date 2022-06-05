@@ -233,3 +233,41 @@ export class GameObjectMovedEvent {
         this.newPosition = newPosition;
     }
 }
+
+/**
+ * An event for when a game object is added to the game board.
+ */
+export class GameObjectAddedEvent {
+    readonly gameObject: GameObject;
+    readonly position: Position;
+
+    /**
+     * Create a new GameObjectAddedEvent event.
+     *
+     * @param object - the new game object
+     * @param position - the position of the object
+     */
+    constructor(object: GameObject, position: Position) {
+        this.gameObject = object;
+        this.position = position;
+    }
+}
+
+/**
+ * An event for when a game object is removed from the game board.
+ */
+export class GameObjectRemovedEvent {
+    readonly gameObject: GameObject;
+    readonly position: Position;
+
+    /**
+     * Create a new GameObjectRemovedEvent event.
+     *
+     * @param object - the game object being removed
+     * @param position - the last position of the object
+     */
+    constructor(object: GameObject, position: Position) {
+        this.gameObject = object;
+        this.position = position;
+    }
+}

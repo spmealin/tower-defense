@@ -1,5 +1,6 @@
 import {
     EnemyEvent,
+    GameObjectAddedEvent,
     GameObjectMovedEvent,
     TowerEvent
 } from "../events/StatusEvents";
@@ -182,6 +183,9 @@ export class GameBoard extends GameObject {
         if ("position" in gameObject) {
             const { x, y } = gameObject.position;
             this._contentsMap[x][y] = gameObject;
+            this._game.eventBus.raiseEvent(
+                new GameObjectAddedEvent(gameObject, gameObject.position)
+            );
         }
         this._children.push(gameObject);
     }

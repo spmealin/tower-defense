@@ -90,7 +90,7 @@ async function initializeGameBoard(cb: (board: string[][]) => void) {
  * @param board - the board of the game
  */
 function pageInit(root: HTMLElement, board: string[][]): void {
-    // Page setup - interactive focus eleemnt
+    // Page setup - interactive focus elemnt
     const focusDiv = document.createElement("div");
     focusDiv.setAttribute("tabIndex", "0");
     root.appendChild(focusDiv);
@@ -117,6 +117,7 @@ function pageInit(root: HTMLElement, board: string[][]): void {
     // SpeechRenderer setup
     speechRenderer = new SpeechRenderer(game);
     speechRenderer.startListening();
+    speechRenderer.observer = observer;
 
     // AudioRenderer setup
     audioRenderer = new AudioRenderer(game);

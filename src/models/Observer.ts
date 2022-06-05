@@ -31,10 +31,6 @@ export class Observer {
      */
     buildTower(): void {
         this._game.gameBoard.buildTower(this._position);
-        // Raise event.
-        this._game.eventBus.raiseEvent(
-            new ObserverMovedEvent(this, this._position, this._position)
-        );
     }
 
     /**
