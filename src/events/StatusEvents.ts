@@ -1,5 +1,6 @@
 import type { Enemy } from "../models/Enemy";
 import type { GameObject } from "../models/GameObject";
+import type { HomebaseStatus } from "../models/Homebase";
 import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
 import type { Tower } from "../models/Tower";
@@ -59,8 +60,8 @@ export class TowerEvent {
  * Attack event, called by an enemy or a tower
  */
 export class AttackEvent {
-    readonly origin: Tower | Enemy;
-    readonly target: Tower | Enemy;
+    readonly origin: GameObject;
+    readonly target: GameObject;
     readonly attackPoints: number;
 
     /**
@@ -70,11 +71,7 @@ export class AttackEvent {
      * @param target - who is being fired on
      * @param attackPoints - the attack power
      */
-    constructor(
-        origin: Tower | Enemy,
-        target: Enemy | Tower,
-        attackPoints: number
-    ) {
+    constructor(origin: GameObject, target: GameObject, attackPoints: number) {
         this.origin = origin;
         this.target = target;
         this.attackPoints = attackPoints;
@@ -269,5 +266,21 @@ export class GameObjectRemovedEvent {
     constructor(object: GameObject, position: Position) {
         this.gameObject = object;
         this.position = position;
+    }
+}
+
+/**
+ * An event to communicate a change in homebase.
+ */
+export class HomebaseEvent {
+    public readonly status: HomebaseStatus;
+
+    /**
+     * Create a HomebaseEvent.
+     *
+     * @param status - the status of the homebase
+     */
+    constructor(status: HomebaseStatus) {
+        this.status = status;
     }
 }

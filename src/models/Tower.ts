@@ -1,23 +1,19 @@
 import { Position } from "./Position";
-import { GameObject } from "./GameObject";
 import { TowerEventType, TowerStatus } from "../types";
 import type { Game } from "../Game";
 import { AttackEvent, TowerEvent } from "../events/StatusEvents";
 import { Enemy } from "./Enemy";
+import { Building } from "./Building";
 
 /**
  * An individual tower
  */
-export class Tower extends GameObject {
-    private _game: Game;
-    private _position: Position;
+export class Tower extends Building {
     private _range = 2;
     private _cellsInRange: Position[] = [];
     private _towerStatus = TowerStatus.building;
     private _elapsedTime = 0;
     private _builtTime = 10 * 1000;
-    private readonly _startingHealth = 100;
-    private _health = this._startingHealth;
     private _attack = 10;
     private _timeSinceFiring = 0;
 
@@ -28,10 +24,7 @@ export class Tower extends GameObject {
      * @param position - where the tower is
      */
     constructor(game: Game, position: Position) {
-        super();
-        this._game = game;
-        this._position = position;
-
+        super(game, position);
         // Determine which cells are in range:
         for (
             let i = this._position.x - this._range;
@@ -72,31 +65,10 @@ export class Tower extends GameObject {
     }
 
     /**
-     * The position of the tower
-     */
-    get position(): Position {
-        return this._position;
-    }
-
-    /**
      * Tower's status
      */
     get towerStatus(): TowerStatus {
         return this._towerStatus;
-    }
-
-    /**
-     * Get health of tower
-     */
-    get health(): number {
-        return this._health;
-    }
-
-    /**
-     * Get health of tower, represented as percent of starting health
-     */
-    get healthAsPercent(): number {
-        return this._health / this._startingHealth;
     }
 
     /**
@@ -105,6 +77,7 @@ export class Tower extends GameObject {
      * @param delta seconds passed
      */
     update(delta: number) {
+        super.update(delta);
         this._elapsedTime += delta;
         this._timeSinceFiring += delta;
 
@@ -119,7 +92,9 @@ export class Tower extends GameObject {
             // it should wait another frame before trying to do things,
             // like fire on enemies.
             return;
-        } else if (this._towerStatus === TowerStatus.dead) {
+        }
+        // Check if this tower is dead but not yet removed from the board.
+        else if (this._towerStatus === TowerStatus.dead) {
             this._game.gameBoard.destroyChild(this);
             return;
         }

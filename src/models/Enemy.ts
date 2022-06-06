@@ -2,10 +2,10 @@ import type { HardCodedPath } from "../ai/HardCodedPath";
 import type { EventBus } from "../events/EventBus";
 import { AttackEvent, EnemyEvent } from "../events/StatusEvents";
 import { EnemyEventType } from "../types";
+import { Building } from "./Building";
 import type { GameBoard } from "./GameBoard";
 import { GameObject } from "./GameObject";
 import type { Position } from "./Position";
-import { Tower } from "./Tower";
 
 /** How long it takes for an enemy to cross a position in milliseconds */
 const SPEED = 3000;
@@ -119,7 +119,7 @@ export class Enemy extends GameObject {
             this._position = newPosition;
         } else {
             const blockage = this._gameBoard.getContents(newPosition);
-            if (blockage instanceof Tower) {
+            if (blockage instanceof Building) {
                 this._eventBus.raiseEvent(
                     new AttackEvent(this, blockage, this._attack)
                 );

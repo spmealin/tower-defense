@@ -8,6 +8,7 @@ import type { Game } from "../Game";
 import { EnemyEventType, TowerEventType } from "../types";
 import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
+import { Homebase } from "./Homebase";
 import { Position } from "./Position";
 import { Tower } from "./Tower";
 
@@ -16,14 +17,13 @@ import { Tower } from "./Tower";
  */
 export const enum Terrain {
     road,
-    blocked,
-    home
+    blocked
 }
 
 const tileCodeMap = {
     "0": Terrain.blocked,
     "1": Terrain.road,
-    X: Terrain.home,
+    X: Terrain.road,
     S: Terrain.road
 };
 
@@ -37,6 +37,7 @@ export class GameBoard extends GameObject {
     private _boardWidth = -1; // Set by the initializeBoard method
     private _boardHeight = -1; // Set by the initializeBoard method
     private readonly _enemySpawnPoints: Position[] = [];
+    private _homebase: Homebase | null = null;
 
     /**
      * Create a GameBoard.
@@ -58,7 +59,7 @@ export class GameBoard extends GameObject {
         // Get the board width and height from the number of columns and the first column.
         this._boardWidth = board.length;
         this._boardHeight = board[0].length;
-        // Create the terrain map and look for enemy spawn points.
+        // Create the terrain map and look for objects like the homebase and enemy spawn points.
         for (let i = 0; i < board.length; i++) {
             const col: Terrain[] = [];
             for (let j = 0; j < board[i].length; j++) {
@@ -67,6 +68,14 @@ export class GameBoard extends GameObject {
                 // TODO: using a hardcoded "S" here is going to screw us over at some point.
                 if (board[i][j] === "S") {
                     this._enemySpawnPoints.push(new Position(i, j));
+                }
+                // Like above, using "X" is going to matter at some point.
+                else if (board[i][j] === "X") {
+                    this._homebase = new Homebase(
+                        this._game,
+                        new Position(i, j)
+                    );
+                    // TODO: protect against multiple homebases (you can't trust map authors).
                 }
             }
             if (col.length !== this._boardHeight) {
@@ -80,6 +89,10 @@ export class GameBoard extends GameObject {
         if (this._enemySpawnPoints.length === 0) {
             throw new Error("There are no enemy spawn points on the map.");
         }
+        // Make sure there's a homebase.
+        if (!this._homebase) {
+            throw new Error("There must be a homebase on the map.");
+        }
         // Create the contents of the board.
         for (let i = 0; i < this._boardWidth; i++) {
             const temp: (GameObject | null)[] = [];
@@ -88,6 +101,10 @@ export class GameBoard extends GameObject {
             }
             this._contentsMap.push(temp);
         }
+        // Make sure homebase is actually on the map.
+        const { x, y } = this._homebase.position;
+        this._contentsMap[x][y] = this._homebase;
+        this._children.push(this._homebase);
     }
 
     /**
@@ -256,5 +273,19 @@ export class GameBoard extends GameObject {
      */
     get enemySpawnPoints(): Position[] {
         return this._enemySpawnPoints;
+    }
+
+    /**
+     * The homebase.
+     *
+     * @readonly
+     */
+    get homebase(): Homebase {
+        if (!this._homebase) {
+            throw new Error(
+                "There is no homebase, have you initialized the game board?"
+            );
+        }
+        return this._homebase;
     }
 }

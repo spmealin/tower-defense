@@ -7,6 +7,7 @@ import {
 import type { Game } from "../../Game";
 import { Enemy } from "../../models/Enemy";
 import type { GameObject } from "../../models/GameObject";
+import { Homebase } from "../../models/Homebase";
 import type { Observer } from "../../models/Observer";
 import { Tower } from "../../models/Tower";
 import { TowerStatus } from "../../types";
@@ -34,6 +35,10 @@ function describeContents(contents: GameObject | null): string {
         contents.towerStatus === TowerStatus.active
     ) {
         return `Tower, ${Math.floor(contents.healthAsPercent * 100)}%`;
+    }
+
+    if (contents instanceof Homebase) {
+        return `Homebase, ${Math.floor(contents.healthAsPercent * 100)}%`;
     }
 
     if (contents instanceof Enemy) {

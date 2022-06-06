@@ -10,6 +10,8 @@ export class AnimationClock {
     private readonly _callback: newFrameCallback;
     private _cancelRenderToken: number | null;
     private _lastFrameTime: number | null;
+    // Use stopRequested since cancel tokens don't always work.
+    private _stopRequested = false;
 
     /**
      * Create a new AnimationClock object.
@@ -26,9 +28,10 @@ export class AnimationClock {
      * Start requesting frames.
      */
     start(): void {
-        this._cancelRenderToken = window.requestAnimationFrame((time) =>
-            this._handleNewFrame(time)
+        this._cancelRenderToken = window.requestAnimationFrame(
+            this._handleNewFrame
         );
+        this._stopRequested = false;
     }
 
     /**
@@ -40,6 +43,7 @@ export class AnimationClock {
             this._cancelRenderToken = null;
         }
         this._lastFrameTime = null;
+        this._stopRequested = true;
     }
 
     /**
@@ -48,7 +52,10 @@ export class AnimationClock {
      * @param time - the time of the frame
      * @private
      */
-    _handleNewFrame(time: DOMHighResTimeStamp): void {
+    private _handleNewFrame = (time: DOMHighResTimeStamp) => {
+        if (this._stopRequested) {
+            return;
+        }
         if (this._lastFrameTime) {
             const delta = time - this._lastFrameTime;
             this._callback(delta);
@@ -57,8 +64,8 @@ export class AnimationClock {
             // If this is the first frame, we will not call the callback so they never have to deal with deltas that are not defined.
             this._lastFrameTime = time;
         }
-        this._cancelRenderToken = window.requestAnimationFrame((time) =>
-            this._handleNewFrame(time)
+        this._cancelRenderToken = window.requestAnimationFrame(
+            this._handleNewFrame
         );
-    }
+    };
 }

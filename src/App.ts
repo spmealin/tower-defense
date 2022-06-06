@@ -4,7 +4,7 @@ import {
     UIStatusMessageEvent,
     UIStatusSoundEvent
 } from "./events/StatusEvents";
-import { Game } from "./Game";
+import { Game, GameStatus } from "./Game";
 import { KeyboardManager, KeyTransition } from "./input/KeyboardManager";
 import * as keys from "./input/KeyConstants";
 import { Observer } from "./models/Observer";
@@ -112,7 +112,7 @@ function pageInit(root: HTMLElement, board: string[][]): void {
 
     // Input setup
     keyboardManager = new KeyboardManager(focusDiv);
-    observer = new Observer(game, 25, 25);
+    observer = new Observer(game, game.gameBoard.homebase.position);
 
     // SpeechRenderer setup
     speechRenderer = new SpeechRenderer(game);
@@ -211,6 +211,11 @@ function startGame() {
  * @param delta - the time in milliseconds since the last frame
  */
 function handleNewFrame(delta: number): void {
+    if (game.status === GameStatus.completed) {
+        // eslint-disable-next-line no-alert
+        alert("The game is over because you let your homebase be destroied.");
+        animationClock.stop();
+    }
     game.update(delta);
     keyboardManager.update();
     visualManager.update();

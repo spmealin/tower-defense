@@ -1,5 +1,6 @@
 import type { Game } from "../../Game";
 import { Enemy } from "../../models/Enemy";
+import { Homebase } from "../../models/Homebase";
 import type { Position } from "../../models/Position";
 import { Tower } from "../../models/Tower";
 import { TowerStatus } from "../../types";
@@ -93,6 +94,13 @@ export class Artist {
         if (contentsOfTile instanceof Enemy) {
             ctx.strokeText(
                 "E",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        }
+        if (contentsOfTile instanceof Homebase) {
+            ctx.strokeText(
+                "H",
                 (pos.x + 0.3) * this._cellWidth,
                 (50 - pos.y + 0.7) * this._cellHeight
             );
