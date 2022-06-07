@@ -1,7 +1,9 @@
 import {
+    AttackEvent,
     GameObjectAddedEvent,
     GameObjectMovedEvent,
     ObserverMovedEvent,
+    TowerEvent,
     UIStatusMessageEvent
 } from "../../events/StatusEvents";
 import type { Game } from "../../Game";
@@ -80,6 +82,14 @@ export class SpeechRenderer {
             GameObjectAddedEvent,
             this._handleObjectAddedEvent
         );
+        this._game.eventBus.addEventHandler(
+            TowerEvent,
+            this._handleTowerStatusUpdateEvent
+        );
+        this._game.eventBus.addEventHandler(
+            AttackEvent,
+            this._handleHealthChangeEvent
+        );
     }
 
     get observer(): Observer | null {
@@ -122,6 +132,44 @@ export class SpeechRenderer {
             this._game.eventBus.raiseEvent(
                 new UIStatusMessageEvent(spokenContents)
             );
+        }
+    };
+
+    /**
+     * Handle when an object moves into the same square as the tracked observer.
+     *
+     * @param event - the event
+     */
+    private _handleTowerStatusUpdateEvent = (event: TowerEvent) => {
+        if (
+            this._observer &&
+            event.tower.position.equals(this._observer.position)
+        ) {
+            const p = event.tower.position;
+            const contents = this._game.gameBoard.getContents(p);
+            const spokenContents = describeContents(contents);
+            this._game.eventBus.raiseEvent(
+                new UIStatusMessageEvent(spokenContents)
+            );
+        }
+    };
+
+    /**
+     * Handle when an object moves into the same square as the tracked observer.
+     *
+     * @param event - the event
+     */
+    private _handleHealthChangeEvent = (event: AttackEvent) => {
+        if (event.target instanceof Tower || event.target instanceof Enemy) {
+            const { position } = event.target;
+
+            if (this._observer && position.equals(this._observer.position)) {
+                const contents = this._game.gameBoard.getContents(position);
+                const spokenContents = describeContents(contents);
+                this._game.eventBus.raiseEvent(
+                    new UIStatusMessageEvent(spokenContents)
+                );
+            }
         }
     };
 
