@@ -1,11 +1,12 @@
-import type { Position } from "./Position";
-import { GameObject } from "./GameObject";
 import type { Game } from "../Game";
+import { GameObject } from "./GameObject";
+import type { HasPosition } from "./hasPosition";
+import type { Position } from "./Position";
 
 /**
  * An abstract building.
  */
-export abstract class Building extends GameObject {
+export abstract class Building extends GameObject implements HasPosition {
     protected _game: Game;
     protected _position: Position;
     protected _startingHealth = 100;

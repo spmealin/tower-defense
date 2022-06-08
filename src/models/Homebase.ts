@@ -59,7 +59,7 @@ export class Homebase extends Building {
      *
      * @param event - the event
      */
-    private _handleAttackEvent = (event: AttackEvent) => {
+    private _handleAttackEvent = (event: AttackEvent<Homebase>) => {
         if (event.target === this) {
             this._health -= event.attackPoints;
             if (this._health < 0) {

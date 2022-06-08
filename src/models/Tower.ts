@@ -1,9 +1,10 @@
-import { Position } from "./Position";
-import { TowerEventType, TowerStatus } from "../types";
-import type { Game } from "../Game";
 import { AttackEvent, TowerEvent } from "../events/StatusEvents";
-import { Enemy } from "./Enemy";
+import type { Game } from "../Game";
+import { TowerEventType, TowerStatus } from "../types";
 import { Building } from "./Building";
+import { Enemy } from "./Enemy";
+import type { HasPosition } from "./hasPosition";
+import { Position } from "./Position";
 
 /**
  * An individual tower
@@ -119,7 +120,7 @@ export class Tower extends Building {
             // If there are any, pick the first enemy, and fire an event
             const target = enemies[0];
             this._game.eventBus.raiseEvent(
-                new AttackEvent(this, target, this._attack)
+                new AttackEvent<HasPosition>(this, target, this._attack)
             );
             this._timeSinceFiring = 0;
         }
@@ -130,7 +131,7 @@ export class Tower extends Building {
      *
      * @param event - the event
      */
-    private _handleAttackEvent = (event: AttackEvent) => {
+    private _handleAttackEvent = (event: AttackEvent<Tower>) => {
         if (event.target === this) {
             this._health -= event.attackPoints;
             if (this._health < 0) {

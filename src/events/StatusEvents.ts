@@ -59,9 +59,9 @@ export class TowerEvent {
 /**
  * Attack event, called by an enemy or a tower
  */
-export class AttackEvent {
-    readonly origin: GameObject;
-    readonly target: GameObject;
+export class AttackEvent<T> {
+    readonly origin: T;
+    readonly target: T;
     readonly attackPoints: number;
 
     /**
@@ -71,7 +71,7 @@ export class AttackEvent {
      * @param target - who is being fired on
      * @param attackPoints - the attack power
      */
-    constructor(origin: GameObject, target: GameObject, attackPoints: number) {
+    constructor(origin: T, target: T, attackPoints: number) {
         this.origin = origin;
         this.target = target;
         this.attackPoints = attackPoints;

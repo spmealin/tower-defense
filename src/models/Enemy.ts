@@ -5,6 +5,7 @@ import { EnemyEventType } from "../types";
 import { Building } from "./Building";
 import type { GameBoard } from "./GameBoard";
 import { GameObject } from "./GameObject";
+import type { HasPosition } from "./hasPosition";
 import type { Position } from "./Position";
 
 /** How long it takes for an enemy to cross a position in milliseconds */
@@ -13,7 +14,7 @@ const SPEED = 3000;
 /**
  * A simple enemy.
  */
-export class Enemy extends GameObject {
+export class Enemy extends GameObject implements HasPosition {
     private readonly _gameBoard: GameBoard;
     private readonly _path: HardCodedPath;
     private readonly _eventBus: EventBus;
@@ -75,7 +76,7 @@ export class Enemy extends GameObject {
      *
      * @param event - the event
      */
-    private _handleAttackEvent = (event: AttackEvent) => {
+    private _handleAttackEvent = (event: AttackEvent<Enemy>) => {
         if (event.target === this) {
             this._health -= event.attackPoints;
             if (this._health < 0) {
@@ -121,7 +122,7 @@ export class Enemy extends GameObject {
             const blockage = this._gameBoard.getContents(newPosition);
             if (blockage instanceof Building) {
                 this._eventBus.raiseEvent(
-                    new AttackEvent(this, blockage, this._attack)
+                    new AttackEvent<HasPosition>(this, blockage, this._attack)
                 );
             }
         }

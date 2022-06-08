@@ -9,6 +9,7 @@ import {
 import type { Game } from "../../Game";
 import { Enemy } from "../../models/Enemy";
 import type { GameObject } from "../../models/GameObject";
+import type { HasPosition } from "../../models/hasPosition";
 import { Homebase } from "../../models/Homebase";
 import type { Observer } from "../../models/Observer";
 import { Tower } from "../../models/Tower";
@@ -159,17 +160,15 @@ export class SpeechRenderer {
      *
      * @param event - the event
      */
-    private _handleHealthChangeEvent = (event: AttackEvent) => {
-        if (event.target instanceof Tower || event.target instanceof Enemy) {
-            const { position } = event.target;
+    private _handleHealthChangeEvent = (event: AttackEvent<HasPosition>) => {
+        const { position } = event.target;
 
-            if (this._observer && position.equals(this._observer.position)) {
-                const contents = this._game.gameBoard.getContents(position);
-                const spokenContents = describeContents(contents);
-                this._game.eventBus.raiseEvent(
-                    new UIStatusMessageEvent(spokenContents)
-                );
-            }
+        if (this._observer && position.equals(this._observer.position)) {
+            const contents = this._game.gameBoard.getContents(position);
+            const spokenContents = describeContents(contents);
+            this._game.eventBus.raiseEvent(
+                new UIStatusMessageEvent(spokenContents)
+            );
         }
     };
 
