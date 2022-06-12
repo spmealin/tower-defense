@@ -1,3 +1,4 @@
+import { HandlerPriority } from "../../events/EventBus";
 import {
     AttackEvent,
     GameObjectAddedEvent,
@@ -71,25 +72,31 @@ export class SpeechRenderer {
      * Start listening for events.
      */
     startListening(): void {
+        // Make sure to set priority to low so we let all other game objects update before us.
         this._game.eventBus.addEventHandler(
             ObserverMovedEvent,
-            this._handleObserverMovedEvents
+            this._handleObserverMovedEvents,
+            HandlerPriority.low
         );
         this._game.eventBus.addEventHandler(
             GameObjectMovedEvent,
-            this._handleObjectMovedEvent
+            this._handleObjectMovedEvent,
+            HandlerPriority.low
         );
         this._game.eventBus.addEventHandler(
             GameObjectAddedEvent,
-            this._handleObjectAddedEvent
+            this._handleObjectAddedEvent,
+            HandlerPriority.low
         );
         this._game.eventBus.addEventHandler(
             TowerEvent,
-            this._handleTowerStatusUpdateEvent
+            this._handleTowerStatusUpdateEvent,
+            HandlerPriority.low
         );
         this._game.eventBus.addEventHandler(
             AttackEvent,
-            this._handleHealthChangeEvent
+            this._handleHealthChangeEvent,
+            HandlerPriority.low
         );
     }
 

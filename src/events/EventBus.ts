@@ -143,7 +143,7 @@ export class EventBus {
             if (handlerList && handlerList.length > 0) {
                 // Call each handler with the event.
                 handlerList.forEach((handler) => {
-                    if(typeof handler === "function") {
+                    if (typeof handler === "function") {
                         handler(event);
                     }
                 });
