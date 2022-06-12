@@ -1,9 +1,34 @@
 /**
+ * When a client registers a handler, they can register it with these priorities.
+ */
+export enum HandlerPriority {
+    high,
+    normal,
+    low
+}
+
+/** Type for mapping priority to handlers */
+type PriorityToHandlers = Map<HandlerPriority, unknown[]>;
+
+/**
+ * Get a new handler map properly configured with the priority keys.
+ *
+ * @returns a new map with no handlers
+ */
+function newPriorityHandlerMap(): PriorityToHandlers {
+    const m: Map<HandlerPriority, unknown[]> = new Map();
+    m.set(HandlerPriority.high, []);
+    m.set(HandlerPriority.normal, []);
+    m.set(HandlerPriority.low, []);
+    return m;
+}
+
+/**
  * An event bus which allows adding and removing handlers, as well as raising events.
  * Make sure to call dispatchEvents to actually send all of the events.
  */
 export class EventBus {
-    private _handlerMap: Map<string, unknown[]> = new Map();
+    private _handlerMap: Map<string, PriorityToHandlers> = new Map();
     private _queuedEvents: unknown[] = [];
 
     /**
@@ -11,21 +36,35 @@ export class EventBus {
      *
      * @param eventType - the type of events that should be listened for
      * @param handler - a function to handle the event
+     * @param priority - the priority of the handler, defaults to normal
      */
     public addEventHandler<T>(
         /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         eventType: { new (...args: any[]): T },
-        handler: (event: T) => void
+        handler: (event: T) => void,
+        priority = HandlerPriority.normal
     ): void {
         // Check if this is the first handler for this event type.
         if (!this._handlerMap.has(eventType.name)) {
-            this._handlerMap.set(eventType.name, [handler]);
+            const m = newPriorityHandlerMap();
+            m.get(priority)?.push(handler);
+            this._handlerMap.set(eventType.name, m);
             return;
         }
         // Only add this handler to the list of event type handlers if isn't already there.
-        const currentHandlers = this._handlerMap.get(eventType.name);
-        if (currentHandlers && !currentHandlers.includes(handler)) {
-            currentHandlers.push(handler);
+        const currentMap = this._handlerMap.get(eventType.name);
+        let found = false;
+        [
+            currentMap?.get(HandlerPriority.high),
+            currentMap?.get(HandlerPriority.normal),
+            currentMap?.get(HandlerPriority.low)
+        ].forEach((handlerList) => {
+            if (!found && handlerList && handlerList.includes(handler)) {
+                found = true;
+            }
+        });
+        if (!found) {
+            currentMap?.get(priority)?.push(handler);
         }
     }
 
@@ -45,13 +84,16 @@ export class EventBus {
             return;
         }
         // Find and remove this handler.
-        const currentHandlers = this._handlerMap.get(eventType.name);
-        if (currentHandlers) {
-            const index = currentHandlers.indexOf(handler);
-            if (index >= 0) {
-                currentHandlers.splice(index, 1);
+        const currentMap = this._handlerMap.get(eventType.name);
+        [
+            currentMap?.get(HandlerPriority.high),
+            currentMap?.get(HandlerPriority.normal),
+            currentMap?.get(HandlerPriority.low)
+        ].forEach((handlerList) => {
+            if (handlerList && handlerList.includes(handler)) {
+                handlerList.splice(handlerList.indexOf(handler), 1);
             }
-        }
+        });
     }
 
     /**
@@ -91,14 +133,21 @@ export class EventBus {
         ) {
             return;
         }
-        // For each handler, call it with the event.
-        const currentHandlers = this._handlerMap.get(event.constructor.name);
-        if (currentHandlers) {
-            currentHandlers.forEach((handler: unknown) => {
-                if (typeof handler === "function") {
-                    handler(event);
-                }
-            });
-        }
+        // Go through all of the handler priorities.
+        const currentMap = this._handlerMap.get(event.constructor.name);
+        [
+            currentMap?.get(HandlerPriority.high),
+            currentMap?.get(HandlerPriority.normal),
+            currentMap?.get(HandlerPriority.low)
+        ].forEach((handlerList) => {
+            if (handlerList && handlerList.length > 0) {
+                // Call each handler with the event.
+                handlerList.forEach((handler) => {
+                    if(typeof handler === "function") {
+                        handler(event);
+                    }
+                });
+            }
+        });
     }
 }
