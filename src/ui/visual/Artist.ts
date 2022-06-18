@@ -1,8 +1,11 @@
 import type { Game } from "../../Game";
 import { Enemy } from "../../models/Enemy";
+import { EnemyFast } from "../../models/EnemyFast";
 import { Homebase } from "../../models/Homebase";
 import type { Position } from "../../models/Position";
 import { Tower } from "../../models/Tower";
+import { TowerArcher } from "../../models/TowerArcher";
+import { TowerBarricade } from "../../models/Tower_Barricade";
 import { TowerStatus } from "../../types";
 
 const VISUAL_WIDTH = 800;
@@ -91,9 +94,30 @@ export class Artist {
                 (50 - pos.y + 0.7) * this._cellHeight
             );
         }
+        if (contentsOfTile instanceof TowerArcher) {
+            ctx.strokeText(
+                contentsOfTile.towerStatus === TowerStatus.building ? "a" : "A",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        }
+        if (contentsOfTile instanceof TowerBarricade) {
+            ctx.strokeText(
+                "B",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        }
         if (contentsOfTile instanceof Enemy) {
             ctx.strokeText(
                 "E",
+                (pos.x + 0.3) * this._cellWidth,
+                (50 - pos.y + 0.7) * this._cellHeight
+            );
+        }
+        if (contentsOfTile instanceof EnemyFast) {
+            ctx.strokeText(
+                "F",
                 (pos.x + 0.3) * this._cellWidth,
                 (50 - pos.y + 0.7) * this._cellHeight
             );

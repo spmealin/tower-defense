@@ -7,10 +7,13 @@ import {
 import type { Game } from "../Game";
 import { EnemyEventType, TowerEventType } from "../types";
 import type { Enemy } from "./Enemy";
+import type { EnemyFast } from "./EnemyFast";
 import { GameObject } from "./GameObject";
 import { Homebase } from "./Homebase";
 import { Position } from "./Position";
 import { Tower } from "./Tower";
+import { TowerArcher } from "./TowerArcher";
+import { TowerBarricade } from "./Tower_Barricade";
 
 /**
  * The possible terrains in a position.
@@ -165,8 +168,41 @@ export class GameBoard extends GameObject {
      * @param position - location of tower
      */
     buildTower(position: Position): void {
-        if (!this.getContents(position)) {
+        if (
+            !this.getContents(position) &&
+            this._game.pointManager.deductPoints(15)
+        ) {
             const tower = new Tower(this._game, position);
+            this._addGameObjectToMap(tower);
+        }
+    }
+
+    /**
+     * Build an archer tower
+     *
+     * @param position - location of tower
+     */
+    buildTowerArcher(position: Position): void {
+        if (
+            !this.getContents(position) &&
+            this._game.pointManager.deductPoints(20)
+        ) {
+            const tower = new TowerArcher(this._game, position);
+            this._addGameObjectToMap(tower);
+        }
+    }
+
+    /**
+     * Build a barricade
+     *
+     * @param position - location of tower
+     */
+    buildTowerBarricade(position: Position): void {
+        if (
+            !this.getContents(position) &&
+            this._game.pointManager.deductPoints(10)
+        ) {
+            const tower = new TowerBarricade(this._game, position);
             this._addGameObjectToMap(tower);
         }
     }
@@ -187,7 +223,7 @@ export class GameBoard extends GameObject {
      *
      * @param enemy - the enemy to add
      */
-    addEnemy(enemy: Enemy): void {
+    addEnemy(enemy: Enemy | EnemyFast): void {
         this._addGameObjectToMap(enemy);
     }
 
@@ -196,7 +232,9 @@ export class GameBoard extends GameObject {
      *
      * @param gameObject - the object to add
      */
-    private _addGameObjectToMap(gameObject: Tower | Enemy | GameObject) {
+    private _addGameObjectToMap(
+        gameObject: Tower | Enemy | EnemyFast | GameObject
+    ) {
         if ("position" in gameObject) {
             const { x, y } = gameObject.position;
             this._contentsMap[x][y] = gameObject;
@@ -287,5 +325,14 @@ export class GameBoard extends GameObject {
             );
         }
         return this._homebase;
+    }
+
+    /**
+     * The points received when enemies die
+     *
+     * @param gold - gold dropped by enemies when killed
+     */
+    goldDrop(gold: number) {
+        this._game.pointManager.addPoints(gold);
     }
 }

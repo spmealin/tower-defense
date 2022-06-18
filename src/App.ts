@@ -14,6 +14,7 @@ import { SpeechRenderer } from "./ui/speech/SpeechRenderer";
 import { ScreenReaderBridge } from "./ui/speech/ScreenReaderBridge";
 import { Artist } from "./ui/visual/Artist";
 import { VisualManager } from "./ui/visual/VisualManager";
+import { PointReporter } from "./ui/PointReporter";
 
 const levelMapFiles = [
     "./maps/straight.txt"
@@ -41,6 +42,7 @@ let visualManager: VisualManager;
 let animationClock: AnimationClock;
 let player: AudioPlayer;
 let artist: Artist;
+let pointReporter: PointReporter;
 
 /**
  * The main entry point of the application.
@@ -131,6 +133,15 @@ function pageInit(root: HTMLElement, board: string[][]): void {
     root.appendChild(drawingContainer);
     artist = new Artist(drawingContainer, game);
     visualManager = new VisualManager(game, observer, artist);
+
+    const pointDiv = document.createElement("div");
+    pointDiv.style.maxWidth = "200px";
+    pointDiv.style.border = "1px solid black";
+    pointDiv.style.top = "10px";
+    pointDiv.style.right = "10px";
+    pointDiv.style.position = "absolute";
+    root.appendChild(pointDiv);
+    pointReporter = new PointReporter(game.pointManager, pointDiv);
 }
 
 /**
@@ -182,6 +193,13 @@ function handlerInit(): void {
         KeyTransition.KeyPressed
     );
     keyboardManager.addHandler(
+        keys.KEY_B,
+        () => {
+            observer.buildTowerBarricade();
+        },
+        KeyTransition.KeyPressed
+    );
+    keyboardManager.addHandler(
         keys.KEY_J,
         () => {
             observer.jumpToTower();
@@ -192,6 +210,20 @@ function handlerInit(): void {
         keys.SPACEBAR,
         () => {
             observer.refresh();
+        },
+        KeyTransition.KeyPressed
+    );
+    keyboardManager.addHandler(
+        keys.KEY_P,
+        () => {
+            sr.render(`${game.pointManager.points}`);
+        },
+        KeyTransition.KeyPressed
+    );
+    keyboardManager.addHandler(
+        keys.KEY_A,
+        () => {
+            observer.buildTowerArcher();
         },
         KeyTransition.KeyPressed
     );
@@ -219,4 +251,5 @@ function handleNewFrame(delta: number): void {
     game.update(delta);
     keyboardManager.update();
     visualManager.update();
+    pointReporter.update();
 }

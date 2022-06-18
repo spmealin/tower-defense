@@ -2,11 +2,18 @@ import { HardCodedPath } from "./ai/HardCodedPath";
 import { EventBus } from "./events/EventBus";
 import { HomebaseEvent } from "./events/StatusEvents";
 import { Enemy } from "./models/Enemy";
+import { EnemyFast } from "./models/EnemyFast";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
 import { HomebaseStatus } from "./models/Homebase";
+import { PointManager } from "./models/PointManager";
 
 const ENEMY_SPAWN_RATE = 10000; // Spawn a new enemy every 10s
+
+const shouldBeFastEnemy = () => {
+    const num = Math.floor(Math.random() * 10);
+    return num === 4;
+};
 
 /**
  * The statuses that the game can be in.
@@ -26,6 +33,7 @@ export class Game extends GameObject {
     private _elapsedGameTime = 0;
     private _lastEnemySpawn = 0;
     private _status = GameStatus.uninitialized;
+    private _pointManager: PointManager;
 
     /**
      * Create a game object.
@@ -39,6 +47,7 @@ export class Game extends GameObject {
             HomebaseEvent,
             this._handleHomebaseEvent
         );
+        this._pointManager = new PointManager(100);
     }
 
     /**
@@ -69,6 +78,13 @@ export class Game extends GameObject {
     }
 
     /**
+     * Get the point manager for this game
+     */
+    get pointManager(): PointManager {
+        return this._pointManager;
+    }
+
+    /**
      * Do any necessary loading.
      *
      * @param board - 2D array of codes, representing aspects of the board
@@ -94,13 +110,23 @@ export class Game extends GameObject {
         this._lastEnemySpawn += delta;
         if (this._lastEnemySpawn >= ENEMY_SPAWN_RATE) {
             this._lastEnemySpawn = 0;
-            const enemy = new Enemy(
-                this._gameBoard,
-                this._eventBus,
-                this._gameBoard.enemySpawnPoints[0],
-                new HardCodedPath()
-            );
-            this._gameBoard.addEnemy?.(enemy);
+            if (shouldBeFastEnemy()) {
+                const enemy = new EnemyFast(
+                    this._gameBoard,
+                    this._eventBus,
+                    this._gameBoard.enemySpawnPoints[0],
+                    new HardCodedPath()
+                );
+                this._gameBoard.addEnemy?.(enemy);
+            } else {
+                const enemy = new Enemy(
+                    this._gameBoard,
+                    this._eventBus,
+                    this._gameBoard.enemySpawnPoints[0],
+                    new HardCodedPath()
+                );
+                this._gameBoard.addEnemy?.(enemy);
+            }
         }
         this._eventBus.dispatchEvents();
         super.update(delta);

@@ -4,12 +4,15 @@ import type { HomebaseStatus } from "../models/Homebase";
 import type { Observer } from "../models/Observer";
 import type { Position } from "../models/Position";
 import type { Tower } from "../models/Tower";
+import type { TowerBarricade } from "../models/Tower_Barricade";
+import type { TowerArcher } from "../models/TowerArcher";
 import type {
     audioCodeOptions,
     EnemyEventType,
     TowerEventType
 } from "../types";
 import type { ErrorMessage } from "./ErrorMessages";
+import type { EnemyFast } from "../models/EnemyFast";
 
 /**
  * An event for when an Observer moves.
@@ -41,7 +44,7 @@ export class ObserverMovedEvent {
  * Event called by a tower
  */
 export class TowerEvent {
-    readonly tower: Tower;
+    readonly tower: Tower | TowerBarricade | TowerArcher;
     readonly type: TowerEventType;
 
     /**
@@ -50,7 +53,10 @@ export class TowerEvent {
      * @param origin - originating tower
      * @param type - type of event
      */
-    constructor(origin: Tower, type: TowerEventType) {
+    constructor(
+        origin: Tower | TowerBarricade | TowerArcher,
+        type: TowerEventType
+    ) {
         this.tower = origin;
         this.type = type;
     }
@@ -82,7 +88,7 @@ export class AttackEvent<T> {
  * Event called by an enemy
  */
 export class EnemyEvent {
-    readonly enemy: Enemy;
+    readonly enemy: Enemy | EnemyFast;
     readonly type: EnemyEventType;
 
     /**
@@ -91,7 +97,7 @@ export class EnemyEvent {
      * @param enemy - relevant enemy
      * @param type - event type
      */
-    constructor(enemy: Enemy, type: EnemyEventType) {
+    constructor(enemy: Enemy | EnemyFast, type: EnemyEventType) {
         this.enemy = enemy;
         this.type = type;
     }

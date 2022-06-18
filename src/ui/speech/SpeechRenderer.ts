@@ -9,11 +9,14 @@ import {
 } from "../../events/StatusEvents";
 import type { Game } from "../../Game";
 import { Enemy } from "../../models/Enemy";
+import { EnemyFast } from "../../models/EnemyFast";
 import type { GameObject } from "../../models/GameObject";
 import type { HasPosition } from "../../models/hasPosition";
 import { Homebase } from "../../models/Homebase";
 import type { Observer } from "../../models/Observer";
 import { Tower } from "../../models/Tower";
+import { TowerArcher } from "../../models/TowerArcher";
+import { TowerBarricade } from "../../models/Tower_Barricade";
 import { TowerStatus } from "../../types";
 
 /**
@@ -41,8 +44,40 @@ function describeContents(contents: GameObject | null): string {
         return `Tower, ${Math.floor(contents.healthAsPercent * 100)}%`;
     }
 
+    if (
+        contents instanceof TowerBarricade &&
+        contents.towerStatus === TowerStatus.building
+    ) {
+        return `building barricade`;
+    }
+
+    if (
+        contents instanceof TowerArcher &&
+        contents.towerStatus === TowerStatus.building
+    ) {
+        return "building archer";
+    }
+
+    if (
+        contents instanceof TowerArcher &&
+        contents.towerStatus === TowerStatus.active
+    ) {
+        return `Archer, ${Math.floor(contents.healthAsPercent * 100)}%`;
+    }
+
+    if (
+        contents instanceof TowerBarricade &&
+        contents.towerStatus === TowerStatus.active
+    ) {
+        return `Barricade, ${Math.floor(contents.healthAsPercent * 100)}%`;
+    }
+
     if (contents instanceof Homebase) {
         return `Homebase, ${Math.floor(contents.healthAsPercent * 100)}%`;
+    }
+
+    if (contents instanceof EnemyFast) {
+        return `Fast Enemy, ${contents.health} HP.`;
     }
 
     if (contents instanceof Enemy) {

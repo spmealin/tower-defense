@@ -9,20 +9,20 @@ import type { HasPosition } from "./hasPosition";
 import type { Position } from "./Position";
 
 /** How long it takes for an enemy to cross a position in milliseconds */
-const SPEED = 3000;
+const SPEED = 1000;
 
 /**
  * A simple enemy.
  */
-export class Enemy extends GameObject implements HasPosition {
+export class EnemyFast extends GameObject implements HasPosition {
     private readonly _gameBoard: GameBoard;
     private readonly _path: HardCodedPath;
     private readonly _eventBus: EventBus;
     private _position: Position;
     private _timeSinceLastMovement = SPEED;
     private _health = 100;
-    private _attack = 15;
-    private _gold = 5;
+    private _attack = 10;
+    private _gold = 10;
 
     /**
      * Create an enemy.
@@ -78,7 +78,7 @@ export class Enemy extends GameObject implements HasPosition {
      *
      * @param event - the event
      */
-    private _handleAttackEvent = (event: AttackEvent<Enemy>) => {
+    private _handleAttackEvent = (event: AttackEvent<EnemyFast>) => {
         if (event.target === this) {
             this._health -= event.attackPoints;
             if (this._health <= 0) {

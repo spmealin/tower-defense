@@ -33,6 +33,20 @@ export class Observer {
     }
 
     /**
+     * Build a tower at the current location
+     */
+    buildTowerArcher(): void {
+        this._game.gameBoard.buildTowerArcher(this._position);
+    }
+
+    /**
+     * Build a tower at the current location
+     */
+    buildTowerBarricade(): void {
+        this._game.gameBoard.buildTowerBarricade(this._position);
+    }
+
+    /**
      * Jump to next tower in the list
      */
     jumpToTower(): void {
