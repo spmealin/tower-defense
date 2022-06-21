@@ -112,7 +112,7 @@ function pageInit(root: HTMLElement, board: string[][]): void {
 
     // Input setup
     keyboardManager = new KeyboardManager(focusDiv);
-    observer = new Observer(game, game.gameBoard.homebase.position);
+    observer = new Observer(game, game.gameBoard.homebasePosition);
 
     // SpeechRenderer setup
     speechRenderer = new SpeechRenderer(game);

@@ -1,4 +1,5 @@
 import type { Enemy } from "../models/Enemy";
+import type { GameBoard } from "../models/GameBoard";
 import type { GameObject } from "../models/GameObject";
 import type { HomebaseStatus } from "../models/Homebase";
 import type { Observer } from "../models/Observer";
@@ -282,5 +283,21 @@ export class HomebaseEvent {
      */
     constructor(status: HomebaseStatus) {
         this.status = status;
+    }
+}
+
+/**
+ * An event to indicate the game board has been initialized.
+ */
+export class GameBoardInitializedEvent {
+    public readonly gameboard: GameBoard;
+
+    /**
+     * Create a new GameBoardInitialized event.
+     *
+     * @param gameboard - the gameboard that has been initialized
+     */
+    constructor(gameboard: GameBoard) {
+        this.gameboard = gameboard;
     }
 }

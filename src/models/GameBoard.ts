@@ -1,14 +1,13 @@
 import {
     EnemyEvent,
+    GameBoardInitializedEvent,
     GameObjectAddedEvent,
-    GameObjectMovedEvent,
-    TowerEvent
+    GameObjectMovedEvent
 } from "../events/StatusEvents";
 import type { Game } from "../Game";
-import { EnemyEventType, TowerEventType } from "../types";
+import { EnemyEventType } from "../types";
 import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
-import { Homebase } from "./Homebase";
 import { Position } from "./Position";
 import { Tower } from "./Tower";
 
@@ -37,7 +36,7 @@ export class GameBoard extends GameObject {
     private _boardWidth = -1; // Set by the initializeBoard method
     private _boardHeight = -1; // Set by the initializeBoard method
     private readonly _enemySpawnPoints: Position[] = [];
-    private _homebase: Homebase | null = null;
+    private _homebasePosition: Position | null = null;
 
     /**
      * Create a GameBoard.
@@ -70,12 +69,8 @@ export class GameBoard extends GameObject {
                     this._enemySpawnPoints.push(new Position(i, j));
                 }
                 // Like above, using "X" is going to matter at some point.
-                else if (board[i][j] === "X") {
-                    this._homebase = new Homebase(
-                        this._game,
-                        new Position(i, j)
-                    );
-                    // TODO: protect against multiple homebases (you can't trust map authors).
+                else if (board[i][j] === "X" && !this._homebasePosition) {
+                    this._homebasePosition = new Position(i, j);
                 }
             }
             if (col.length !== this._boardHeight) {
@@ -90,7 +85,7 @@ export class GameBoard extends GameObject {
             throw new Error("There are no enemy spawn points on the map.");
         }
         // Make sure there's a homebase.
-        if (!this._homebase) {
+        if (!this._homebasePosition) {
             throw new Error("There must be a homebase on the map.");
         }
         // Create the contents of the board.
@@ -101,21 +96,13 @@ export class GameBoard extends GameObject {
             }
             this._contentsMap.push(temp);
         }
-        // Make sure homebase is actually on the map.
-        const { x, y } = this._homebase.position;
-        this._contentsMap[x][y] = this._homebase;
-        this._children.push(this._homebase);
+        this._game.eventBus.raiseEvent(new GameBoardInitializedEvent(this));
     }
 
     /**
      * Start listening for relevant events
      */
     _startListening() {
-        this._game.eventBus.addEventHandler(TowerEvent, (event: TowerEvent) => {
-            if (event.type === TowerEventType.died) {
-                this.clearPosition(event.tower.position);
-            }
-        });
         this._game.eventBus.addEventHandler(EnemyEvent, (event: EnemyEvent) => {
             if (event.type === EnemyEventType.died) {
                 this.clearPosition(event.enemy.position);
@@ -148,27 +135,20 @@ export class GameBoard extends GameObject {
      * @returns the item on the cell (null if nothing)
      */
     getContents(p: Position): GameObject | Tower | Enemy | null {
-        if (
-            p.x < 0 ||
-            p.y < 0 ||
-            p.x >= this.boardWidth ||
-            p.y >= this.boardHeight
-        ) {
+        if (!this.isValidPosition(p)) {
             return null;
         }
         return this._contentsMap[p.x][p.y];
     }
 
     /**
-     * Build a tower
+     * Check if a position is both valid and clear.
      *
-     * @param position - location of tower
+     * @param p - the position to check
+     * @returns true if the position is valid and clear false otherwise
      */
-    buildTower(position: Position): void {
-        if (!this.getContents(position)) {
-            const tower = new Tower(this._game, position);
-            this._addGameObjectToMap(tower);
-        }
+    isValidAndClearPosition(p: Position): boolean {
+        return this.isValidPosition(p) && !this.getContents(p);
     }
 
     /**
@@ -177,8 +157,9 @@ export class GameBoard extends GameObject {
      * @param position - position
      */
     clearPosition(position: Position): void {
-        const { x, y } = position;
-        this._contentsMap[x][y] = null;
+        if (this.isValidPosition(position)) {
+            this._contentsMap[position.x][position.y] = null;
+        }
     }
 
     /**
@@ -188,23 +169,30 @@ export class GameBoard extends GameObject {
      * @param enemy - the enemy to add
      */
     addEnemy(enemy: Enemy): void {
-        this._addGameObjectToMap(enemy);
+        this.addGameObjectToMap(enemy, enemy.position);
     }
 
     /**
      * Add a game object to the map
      *
      * @param gameObject - the object to add
+     * @param position - where to add the object
+     * @returns true if the game object was added false otherwise
      */
-    private _addGameObjectToMap(gameObject: Tower | Enemy | GameObject) {
-        if ("position" in gameObject) {
-            const { x, y } = gameObject.position;
-            this._contentsMap[x][y] = gameObject;
-            this._game.eventBus.raiseEvent(
-                new GameObjectAddedEvent(gameObject, gameObject.position)
-            );
+    public addGameObjectToMap(
+        gameObject: GameObject,
+        position: Position
+    ): boolean {
+        if (!this.isValidAndClearPosition(position)) {
+            return false;
         }
+        const { x, y } = position;
+        this._contentsMap[x][y] = gameObject;
+        this._game.eventBus.raiseEvent(
+            new GameObjectAddedEvent(gameObject, position)
+        );
         this._children.push(gameObject);
+        return true;
     }
 
     /**
@@ -276,16 +264,16 @@ export class GameBoard extends GameObject {
     }
 
     /**
-     * The homebase.
+     * The homebase position.
      *
      * @readonly
      */
-    get homebase(): Homebase {
-        if (!this._homebase) {
+    get homebasePosition(): Position {
+        if (!this._homebasePosition) {
             throw new Error(
                 "There is no homebase, have you initialized the game board?"
             );
         }
-        return this._homebase;
+        return this._homebasePosition;
     }
 }

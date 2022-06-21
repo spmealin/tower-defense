@@ -1,6 +1,7 @@
 import { HardCodedPath } from "./ai/HardCodedPath";
 import { EventBus } from "./events/EventBus";
 import { HomebaseEvent } from "./events/StatusEvents";
+import { BuildingManager } from "./managers/BuildingManager";
 import { Enemy } from "./models/Enemy";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
@@ -26,6 +27,7 @@ export class Game extends GameObject {
     private _elapsedGameTime = 0;
     private _lastEnemySpawn = 0;
     private _status = GameStatus.uninitialized;
+    private readonly _buildingManager: BuildingManager;
 
     /**
      * Create a game object.
@@ -34,6 +36,7 @@ export class Game extends GameObject {
         super();
         this._eventBus = new EventBus();
         this._gameBoard = new GameBoard(this);
+        this._buildingManager = new BuildingManager(this);
         this._children.push(this._gameBoard);
         this._eventBus.addEventHandler(
             HomebaseEvent,
@@ -66,6 +69,15 @@ export class Game extends GameObject {
      */
     get eventBus(): EventBus {
         return this._eventBus;
+    }
+
+    /**
+     * The building manager for this game.
+     *
+     * @readonly
+     */
+    get buildingManager(): BuildingManager {
+        return this._buildingManager;
     }
 
     /**

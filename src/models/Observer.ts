@@ -5,12 +5,13 @@ import {
 import type { Game } from "../Game";
 import { Position } from "./Position";
 import { ErrorMessage } from "../events/ErrorMessages";
+import type { HasPosition } from "./hasPosition";
 
 /**
  * An observer can observe the game.
  * Most of the time, this will be the player's perspective.
  */
-export class Observer {
+export class Observer implements HasPosition {
     private readonly _game: Game;
     private _position: Position;
 
@@ -29,7 +30,7 @@ export class Observer {
      * Build a tower at the current location
      */
     buildTower(): void {
-        this._game.gameBoard.buildTower(this._position);
+        this._game.buildingManager.addBasicTower(this.position);
     }
 
     /**

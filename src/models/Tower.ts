@@ -96,7 +96,10 @@ export class Tower extends Building {
         }
         // Check if this tower is dead but not yet removed from the board.
         else if (this._towerStatus === TowerStatus.dead) {
-            this._game.gameBoard.destroyChild(this);
+            // Announce that we are dead then do nothing.
+            this._game.eventBus.raiseEvent(
+                new TowerEvent(this, TowerEventType.died)
+            );
             return;
         }
 
@@ -134,10 +137,8 @@ export class Tower extends Building {
     private _handleAttackEvent = (event: AttackEvent<Tower>) => {
         if (event.target === this) {
             this._health -= event.attackPoints;
-            if (this._health < 0) {
-                this._game.eventBus.raiseEvent(
-                    new TowerEvent(this, TowerEventType.died)
-                );
+            if (this._health <= 0) {
+                this._health = 0;
                 this._towerStatus = TowerStatus.dead;
             }
         }
