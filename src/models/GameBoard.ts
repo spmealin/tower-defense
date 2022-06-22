@@ -4,10 +4,8 @@ import {
     GameObjectMovedEvent
 } from "../events/StatusEvents";
 import type { Game } from "../Game";
-import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
 import { Position } from "./Position";
-import { Tower } from "./Tower";
 
 /**
  * The possible terrains in a position.
@@ -120,7 +118,7 @@ export class GameBoard extends GameObject {
      * @param p position on map
      * @returns the item on the cell (null if nothing)
      */
-    getContents(p: Position): GameObject | Tower | Enemy | null {
+    getContents(p: Position): GameObject | null {
         if (!this.isValidPosition(p)) {
             return null;
         }
@@ -213,21 +211,6 @@ export class GameBoard extends GameObject {
      */
     get boardHeight(): number {
         return this._boardHeight;
-    }
-
-    /**
-     * Get all of the towers on the board.
-     *
-     * @returns a list of the towers
-     */
-    getAllTowers(): Tower[] {
-        const towers: Tower[] = [];
-        this._children.forEach((child) => {
-            if (child instanceof Tower) {
-                towers.push(child);
-            }
-        });
-        return towers;
     }
 
     /**

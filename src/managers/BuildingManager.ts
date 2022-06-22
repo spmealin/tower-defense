@@ -1,7 +1,7 @@
 import { HandlerPriority } from "../events/EventBus";
 import { GameBoardInitializedEvent, TowerEvent } from "../events/StatusEvents";
 import type { Game } from "../Game";
-import type { GameObject } from "../models/GameObject";
+import type { Building } from "../models/Building";
 import { Homebase } from "../models/Homebase";
 import type { Position } from "../models/Position";
 import { Tower } from "../models/Tower";
@@ -13,7 +13,8 @@ import { TowerEventType } from "../types";
 export class BuildingManager {
     private readonly _game: Game;
     private _buildingDestroyedCount = 0;
-    private _homeBase: GameObject | null = null;
+    private _homeBase: Building | null = null;
+    private readonly _activeTowers: Building[] = [];
 
     /**
      * Create a BuildingManager.
@@ -44,6 +45,29 @@ export class BuildingManager {
     }
 
     /**
+     * Get all of the towers on the game board.
+     *
+     * @readonly
+     */
+    get towers(): Building[] {
+        return this._activeTowers;
+    }
+
+    /**
+     * The home base for this game.
+     *
+     * @readonly
+     */
+    get homeBase(): Building {
+        if (!this._homeBase) {
+            throw new Error(
+                "There is no home base, have you initialized the game board?"
+            );
+        }
+        return this._homeBase;
+    }
+
+    /**
      * Add a basic tower to the map.
      * This will do nothing if the tower cannot be placed at that position.
      *
@@ -52,7 +76,9 @@ export class BuildingManager {
     addBasicTower = (position: Position) => {
         if (this._game.gameBoard.isValidAndClearPosition(position)) {
             const tower = new Tower(this._game, position);
-            this._game.gameBoard.addGameObjectToMap(tower, position);
+            if (this._game.gameBoard.addGameObjectToMap(tower, position)) {
+                this._activeTowers.push(tower);
+            }
         }
     };
 
@@ -76,11 +102,12 @@ export class BuildingManager {
      */
     private _handleTowerEvent = (event: TowerEvent) => {
         if (event.type === TowerEventType.died) {
-            this._game.gameBoard.clearPosition(event.tower.position);
-            this._game.gameBoard.destroyChild(event.tower);
-            this._buildingDestroyedCount++;
-            if (event.tower === this._homeBase) {
-                // Homebase has been destroied, all is lost.
+            const index = this._activeTowers.indexOf(event.tower);
+            if (index !== -1) {
+                this._activeTowers.splice(index, 1);
+                this._buildingDestroyedCount++;
+                this._game.gameBoard.clearPosition(event.tower.position);
+                this._game.gameBoard.destroyChild(event.tower);
             }
         }
     };

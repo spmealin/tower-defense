@@ -37,7 +37,7 @@ export class Observer implements HasPosition {
      * Jump to next tower in the list
      */
     jumpToTower(): void {
-        const towers = this._game.gameBoard.getAllTowers();
+        const towers = this._game.buildingManager.towers;
 
         if (towers.length === 0) {
             this._game.eventBus.raiseEvent(
