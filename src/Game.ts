@@ -1,8 +1,7 @@
-import { HardCodedPath } from "./ai/HardCodedPath";
 import { EventBus } from "./events/EventBus";
 import { HomebaseEvent } from "./events/StatusEvents";
 import { BuildingManager } from "./managers/BuildingManager";
-import { Enemy } from "./models/Enemy";
+import { EnemyManager } from "./managers/EnemyManager";
 import { GameBoard } from "./models/GameBoard";
 import { GameObject } from "./models/GameObject";
 import { HomebaseStatus } from "./models/Homebase";
@@ -28,6 +27,7 @@ export class Game extends GameObject {
     private _lastEnemySpawn = 0;
     private _status = GameStatus.uninitialized;
     private readonly _buildingManager: BuildingManager;
+    private readonly _enemyManager: EnemyManager;
 
     /**
      * Create a game object.
@@ -37,6 +37,7 @@ export class Game extends GameObject {
         this._eventBus = new EventBus();
         this._gameBoard = new GameBoard(this);
         this._buildingManager = new BuildingManager(this);
+        this._enemyManager = new EnemyManager(this);
         this._children.push(this._gameBoard);
         this._eventBus.addEventHandler(
             HomebaseEvent,
@@ -81,6 +82,15 @@ export class Game extends GameObject {
     }
 
     /**
+     * The enemy manager associated with this game.
+     *
+     * @readonly
+     */
+    get enemyManager(): EnemyManager {
+        return this._enemyManager;
+    }
+
+    /**
      * Do any necessary loading.
      *
      * @param board - 2D array of codes, representing aspects of the board
@@ -106,13 +116,7 @@ export class Game extends GameObject {
         this._lastEnemySpawn += delta;
         if (this._lastEnemySpawn >= ENEMY_SPAWN_RATE) {
             this._lastEnemySpawn = 0;
-            const enemy = new Enemy(
-                this._gameBoard,
-                this._eventBus,
-                this._gameBoard.enemySpawnPoints[0],
-                new HardCodedPath()
-            );
-            this._gameBoard.addEnemy?.(enemy);
+            this._enemyManager.addBasicEnemy();
         }
         this._eventBus.dispatchEvents();
         super.update(delta);

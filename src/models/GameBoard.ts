@@ -1,11 +1,9 @@
 import {
-    EnemyEvent,
     GameBoardInitializedEvent,
     GameObjectAddedEvent,
     GameObjectMovedEvent
 } from "../events/StatusEvents";
 import type { Game } from "../Game";
-import { EnemyEventType } from "../types";
 import type { Enemy } from "./Enemy";
 import { GameObject } from "./GameObject";
 import { Position } from "./Position";
@@ -46,7 +44,6 @@ export class GameBoard extends GameObject {
     constructor(game: Game) {
         super();
         this._game = game;
-        this._startListening();
     }
 
     /**
@@ -100,17 +97,6 @@ export class GameBoard extends GameObject {
     }
 
     /**
-     * Start listening for relevant events
-     */
-    _startListening() {
-        this._game.eventBus.addEventHandler(EnemyEvent, (event: EnemyEvent) => {
-            if (event.type === EnemyEventType.died) {
-                this.clearPosition(event.enemy.position);
-            }
-        });
-    }
-
-    /**
      * Check if the given position is valid.
      * A position is valid if it is on the game board and it is a type of terrain that can be moved to.
      *
@@ -160,16 +146,6 @@ export class GameBoard extends GameObject {
         if (this.isValidPosition(position)) {
             this._contentsMap[position.x][position.y] = null;
         }
-    }
-
-    /**
-     * Add an enemy to the map.
-     * TODO: this does not do any error checking, fix that at some point so we cannot add enemies on top of each other.
-     *
-     * @param enemy - the enemy to add
-     */
-    addEnemy(enemy: Enemy): void {
-        this.addGameObjectToMap(enemy, enemy.position);
     }
 
     /**

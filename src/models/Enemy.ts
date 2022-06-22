@@ -80,9 +80,7 @@ export class Enemy extends GameObject implements HasPosition {
         if (event.target === this) {
             this._health -= event.attackPoints;
             if (this._health < 0) {
-                this._eventBus.raiseEvent(
-                    new EnemyEvent(this, EnemyEventType.died)
-                );
+                this._health = 0;
             }
         }
     };
@@ -93,8 +91,10 @@ export class Enemy extends GameObject implements HasPosition {
      * @param delta - the time since update was last called in milliseconds
      */
     update(delta: number): void {
-        if (this._health < 0) {
-            this._gameBoard.destroyChild(this);
+        if (this._health === 0) {
+            this._eventBus.raiseEvent(
+                new EnemyEvent(this, EnemyEventType.died)
+            );
             return;
         }
         this._timeSinceLastMovement -= delta;
